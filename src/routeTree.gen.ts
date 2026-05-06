@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
+import { Route as SlugDepartmentsRouteImport } from './routes/$slug.departments'
 import { Route as SlugAboutRouteImport } from './routes/$slug.about'
 
 const SlugRoute = SlugRouteImport.update({
@@ -29,6 +30,11 @@ const SlugIndexRoute = SlugIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SlugRoute,
 } as any)
+const SlugDepartmentsRoute = SlugDepartmentsRouteImport.update({
+  id: '/departments',
+  path: '/departments',
+  getParentRoute: () => SlugRoute,
+} as any)
 const SlugAboutRoute = SlugAboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -39,11 +45,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRouteWithChildren
   '/$slug/about': typeof SlugAboutRoute
+  '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug/': typeof SlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$slug/about': typeof SlugAboutRoute
+  '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug': typeof SlugIndexRoute
 }
 export interface FileRoutesById {
@@ -51,14 +59,21 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRouteWithChildren
   '/$slug/about': typeof SlugAboutRoute
+  '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug/': typeof SlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$slug' | '/$slug/about' | '/$slug/'
+  fullPaths: '/' | '/$slug' | '/$slug/about' | '/$slug/departments' | '/$slug/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$slug/about' | '/$slug'
-  id: '__root__' | '/' | '/$slug' | '/$slug/about' | '/$slug/'
+  to: '/' | '/$slug/about' | '/$slug/departments' | '/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/$slug'
+    | '/$slug/about'
+    | '/$slug/departments'
+    | '/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -89,6 +104,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugIndexRouteImport
       parentRoute: typeof SlugRoute
     }
+    '/$slug/departments': {
+      id: '/$slug/departments'
+      path: '/departments'
+      fullPath: '/$slug/departments'
+      preLoaderRoute: typeof SlugDepartmentsRouteImport
+      parentRoute: typeof SlugRoute
+    }
     '/$slug/about': {
       id: '/$slug/about'
       path: '/about'
@@ -101,11 +123,13 @@ declare module '@tanstack/react-router' {
 
 interface SlugRouteChildren {
   SlugAboutRoute: typeof SlugAboutRoute
+  SlugDepartmentsRoute: typeof SlugDepartmentsRoute
   SlugIndexRoute: typeof SlugIndexRoute
 }
 
 const SlugRouteChildren: SlugRouteChildren = {
   SlugAboutRoute: SlugAboutRoute,
+  SlugDepartmentsRoute: SlugDepartmentsRoute,
   SlugIndexRoute: SlugIndexRoute,
 }
 
