@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
+import { Route as SlugNewsRouteImport } from './routes/$slug.news'
 import { Route as SlugDepartmentsRouteImport } from './routes/$slug.departments'
 import { Route as SlugAboutRouteImport } from './routes/$slug.about'
 
@@ -30,6 +31,11 @@ const SlugIndexRoute = SlugIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SlugRoute,
 } as any)
+const SlugNewsRoute = SlugNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => SlugRoute,
+} as any)
 const SlugDepartmentsRoute = SlugDepartmentsRouteImport.update({
   id: '/departments',
   path: '/departments',
@@ -46,12 +52,14 @@ export interface FileRoutesByFullPath {
   '/$slug': typeof SlugRouteWithChildren
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/news': typeof SlugNewsRoute
   '/$slug/': typeof SlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/news': typeof SlugNewsRoute
   '/$slug': typeof SlugIndexRoute
 }
 export interface FileRoutesById {
@@ -60,19 +68,27 @@ export interface FileRoutesById {
   '/$slug': typeof SlugRouteWithChildren
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/news': typeof SlugNewsRoute
   '/$slug/': typeof SlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$slug' | '/$slug/about' | '/$slug/departments' | '/$slug/'
+  fullPaths:
+    | '/'
+    | '/$slug'
+    | '/$slug/about'
+    | '/$slug/departments'
+    | '/$slug/news'
+    | '/$slug/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$slug/about' | '/$slug/departments' | '/$slug'
+  to: '/' | '/$slug/about' | '/$slug/departments' | '/$slug/news' | '/$slug'
   id:
     | '__root__'
     | '/'
     | '/$slug'
     | '/$slug/about'
     | '/$slug/departments'
+    | '/$slug/news'
     | '/$slug/'
   fileRoutesById: FileRoutesById
 }
@@ -104,6 +120,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugIndexRouteImport
       parentRoute: typeof SlugRoute
     }
+    '/$slug/news': {
+      id: '/$slug/news'
+      path: '/news'
+      fullPath: '/$slug/news'
+      preLoaderRoute: typeof SlugNewsRouteImport
+      parentRoute: typeof SlugRoute
+    }
     '/$slug/departments': {
       id: '/$slug/departments'
       path: '/departments'
@@ -124,12 +147,14 @@ declare module '@tanstack/react-router' {
 interface SlugRouteChildren {
   SlugAboutRoute: typeof SlugAboutRoute
   SlugDepartmentsRoute: typeof SlugDepartmentsRoute
+  SlugNewsRoute: typeof SlugNewsRoute
   SlugIndexRoute: typeof SlugIndexRoute
 }
 
 const SlugRouteChildren: SlugRouteChildren = {
   SlugAboutRoute: SlugAboutRoute,
   SlugDepartmentsRoute: SlugDepartmentsRoute,
+  SlugNewsRoute: SlugNewsRoute,
   SlugIndexRoute: SlugIndexRoute,
 }
 
