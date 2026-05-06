@@ -9,38 +9,133 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SlugIndexRouteImport } from './routes/$slug.index'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as SlugNoticesRouteImport } from './routes/$slug.notices'
+import { Route as SlugNewsRouteImport } from './routes/$slug.news'
+import { Route as SlugDepartmentsRouteImport } from './routes/$slug.departments'
+import { Route as SlugAboutRouteImport } from './routes/$slug.about'
 
+const SlugRoute = SlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugIndexRoute = SlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SlugRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlugNoticesRoute = SlugNoticesRouteImport.update({
+  id: '/notices',
+  path: '/notices',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugNewsRoute = SlugNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugDepartmentsRoute = SlugDepartmentsRouteImport.update({
+  id: '/departments',
+  path: '/departments',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugAboutRoute = SlugAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => SlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRouteWithChildren
+  '/$slug/about': typeof SlugAboutRoute
+  '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/news': typeof SlugNewsRoute
+  '/$slug/notices': typeof SlugNoticesRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/$slug/': typeof SlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$slug/about': typeof SlugAboutRoute
+  '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/news': typeof SlugNewsRoute
+  '/$slug/notices': typeof SlugNoticesRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/$slug': typeof SlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRouteWithChildren
+  '/$slug/about': typeof SlugAboutRoute
+  '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/news': typeof SlugNewsRoute
+  '/$slug/notices': typeof SlugNoticesRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/$slug/': typeof SlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/$slug'
+    | '/$slug/about'
+    | '/$slug/departments'
+    | '/$slug/news'
+    | '/$slug/notices'
+    | '/admin/login'
+    | '/$slug/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/$slug/about'
+    | '/$slug/departments'
+    | '/$slug/news'
+    | '/$slug/notices'
+    | '/admin/login'
+    | '/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/$slug'
+    | '/$slug/about'
+    | '/$slug/departments'
+    | '/$slug/news'
+    | '/$slug/notices'
+    | '/admin/login'
+    | '/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SlugRoute: typeof SlugRouteWithChildren
+  AdminLoginRoute: typeof AdminLoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/$slug': {
+      id: '/$slug'
+      path: '/$slug'
+      fullPath: '/$slug'
+      preLoaderRoute: typeof SlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +143,73 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug/': {
+      id: '/$slug/'
+      path: '/'
+      fullPath: '/$slug/'
+      preLoaderRoute: typeof SlugIndexRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$slug/notices': {
+      id: '/$slug/notices'
+      path: '/notices'
+      fullPath: '/$slug/notices'
+      preLoaderRoute: typeof SlugNoticesRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/news': {
+      id: '/$slug/news'
+      path: '/news'
+      fullPath: '/$slug/news'
+      preLoaderRoute: typeof SlugNewsRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/departments': {
+      id: '/$slug/departments'
+      path: '/departments'
+      fullPath: '/$slug/departments'
+      preLoaderRoute: typeof SlugDepartmentsRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/about': {
+      id: '/$slug/about'
+      path: '/about'
+      fullPath: '/$slug/about'
+      preLoaderRoute: typeof SlugAboutRouteImport
+      parentRoute: typeof SlugRoute
+    }
   }
 }
 
+interface SlugRouteChildren {
+  SlugAboutRoute: typeof SlugAboutRoute
+  SlugDepartmentsRoute: typeof SlugDepartmentsRoute
+  SlugNewsRoute: typeof SlugNewsRoute
+  SlugNoticesRoute: typeof SlugNoticesRoute
+  SlugIndexRoute: typeof SlugIndexRoute
+}
+
+const SlugRouteChildren: SlugRouteChildren = {
+  SlugAboutRoute: SlugAboutRoute,
+  SlugDepartmentsRoute: SlugDepartmentsRoute,
+  SlugNewsRoute: SlugNewsRoute,
+  SlugNoticesRoute: SlugNoticesRoute,
+  SlugIndexRoute: SlugIndexRoute,
+}
+
+const SlugRouteWithChildren = SlugRoute._addFileChildren(SlugRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SlugRoute: SlugRouteWithChildren,
+  AdminLoginRoute: AdminLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
