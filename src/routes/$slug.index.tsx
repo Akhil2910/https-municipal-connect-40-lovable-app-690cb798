@@ -43,7 +43,9 @@ const QUICK = [
 
 function UlbHome() {
   const ulb = useUlb();
-  const { banners, news, notices, leadership } = Route.useLoaderData();
+  const { banners, news, notices, leadership } = Route.useLoaderData() as {
+    banners: Banner[]; news: News[]; notices: Notice[]; leadership: Leadership[];
+  };
   const slides = banners.length ? banners : [{
     id: "default", image_url: hero,
     title: `Welcome to ${ulb.name} ${ulb.type ?? "Municipality"}`,
