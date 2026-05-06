@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useLoaderData } from "@tanstack/react-router";
 import { fetchUlbBySlug } from "@/lib/ulb-loader";
 import { TopGovBar } from "@/components/site/TopGovBar";
 import { UlbHeader } from "@/components/site/UlbHeader";
@@ -45,7 +45,6 @@ function UlbLayout() {
 }
 
 export function useUlb(): Ulb {
-  const router = useRouter();
-  const match = router.state.matches.find((m) => m.routeId === "/$slug");
-  return (match?.loaderData as { ulb: Ulb }).ulb;
+  const data = useLoaderData({ from: "/$slug" }) as { ulb: Ulb };
+  return data.ulb;
 }
