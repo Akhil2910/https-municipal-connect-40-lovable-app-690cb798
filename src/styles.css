@@ -59,6 +59,12 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-gov-navy: var(--gov-navy);
+  --color-gov-saffron: var(--gov-saffron);
+  --color-gov-green: var(--gov-green);
+  --color-gov-cream: var(--gov-cream);
+  --font-display: 'Merriweather', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
 }
 
 :root {
