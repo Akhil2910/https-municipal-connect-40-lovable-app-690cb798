@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { ulbs } = Route.useLoaderData();
+  const { ulbs } = Route.useLoaderData() as { ulbs: Ulb[] };
   return (
     <div className="min-h-screen flex flex-col">
       <TopGovBar />
