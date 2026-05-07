@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUlb } from "./$slug";
 import { Ticker } from "@/components/site/Ticker";
 import hero from "@/assets/hero-default.jpg";
-import cmPortrait from "@/assets/cm-portrait.jpg";
+import cmPortrait from "@/assets/cm-portrait.png";
 import {
   FileText, Receipt, ScrollText, Hammer, Camera, Building2,
   AlertCircle, Phone, ArrowRight,
