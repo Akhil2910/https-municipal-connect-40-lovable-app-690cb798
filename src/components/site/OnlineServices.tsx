@@ -12,18 +12,18 @@ export type OnlineService = {
 };
 
 export const DEFAULT_ONLINE_SERVICES: OnlineService[] = [
-  { label: "Property Tax",                 icon: Receipt,        url: "#" },
-  { label: "Property Tax (Vacant Land)",   icon: Home,           url: "#" },
-  { label: "Water Tap Connection",         icon: Droplet,        url: "#" },
-  { label: "Trade Licence",                icon: Store,          url: "#" },
-  { label: "Trade Licence Renewal",        icon: RefreshCw,      url: "#" },
-  { label: "Signage Licence (Ads)",        icon: Megaphone,      url: "#" },
-  { label: "Mobile Towers",                icon: RadioTower,     url: "#" },
-  { label: "Mutations",                    icon: FileSignature,  url: "#" },
-  { label: "Building Permission",          icon: Building2,      url: "#" },
-  { label: "Road Cutting Permission",      icon: Construction,   url: "#" },
-  { label: "Grievances",                   icon: AlertCircle,    url: "#" },
-  { label: "Unified Birth & Death",        icon: Baby,           url: "#" },
+  { label: "Property Tax",                 icon: Receipt,        url: "https://cdma.cgg.gov.in/cdma_arbs/CDMA_PG/PTMenu" },
+  { label: "Property Tax (Vacant Land)",   icon: Home,           url: "https://cdma.cgg.gov.in/cdma_arbs/CDMA_VLT/VLTMenu" },
+  { label: "Water Tap Connection",         icon: Droplet,        url: "https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/ljkljkljkl" },
+  { label: "Trade Licence",                icon: Store,          url: "https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/dgdfgdfgdfgfd" },
+  { label: "Trade Licence Renewal",        icon: RefreshCw,      url: "https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/gdfgdfgdf" },
+  { label: "Signage Licence (Ads)",        icon: Megaphone,      url: "https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/bnmbmbnmbn" },
+  { label: "Mobile Towers",                icon: RadioTower,     url: "https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/kjhkjhkjhkjh" },
+  { label: "Mutations",                    icon: FileSignature,  url: "https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/cbvcbvcbcv" },
+  { label: "Building Permission",          icon: Building2,      url: "https://buildnow.telangana.gov.in/" },
+  { label: "Road Cutting Permission",      icon: Construction,   url: "https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/sdfsfsdfsdf" },
+  { label: "Grievances",                   icon: AlertCircle,    url: "https://egovindia.in/ulbwisecomplaints/index.php" },
+  { label: "Unified Birth & Death",        icon: Baby,           url: "https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/mnmbnmnbmnbm" },
 ];
 
 export function OnlineServices({ services = DEFAULT_ONLINE_SERVICES }: { services?: OnlineService[] }) {
