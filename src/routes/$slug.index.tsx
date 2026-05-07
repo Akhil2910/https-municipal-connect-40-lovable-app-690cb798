@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useUlb } from "./$slug";
 import { Ticker } from "@/components/site/Ticker";
+import { OnlineServices } from "@/components/site/OnlineServices";
 import hero from "@/assets/hero-default.jpg";
 import cmPortrait from "@/assets/cm-portrait.png";
 import {
@@ -98,6 +99,9 @@ function UlbHome() {
           ))}
         </div>
       </section>
+
+      {/* Online Services Carousel */}
+      <OnlineServices />
 
       {/* CM / Leadership Banner */}
       <section className="bg-gov-cream border-y">
