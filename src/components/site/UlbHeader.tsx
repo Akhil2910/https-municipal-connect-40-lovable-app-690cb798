@@ -1,5 +1,8 @@
 import { Link, useParams } from "@tanstack/react-router";
 import emblem from "@/assets/ulb-emblem.png";
+import cmPortrait from "@/assets/cm-portrait.png";
+import telanganaLogo from "@/assets/telangana-logo.jpg";
+import risingLogo from "@/assets/rising-2047.png";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import type { Ulb } from "@/lib/ulb-types";
@@ -25,8 +28,13 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
   return (
     <header className="bg-card shadow-sm border-b">
       <div className="container mx-auto flex items-center gap-4 px-4 py-4">
-        <img src={ulb.logo_url || emblem} alt={`${ulb.name} emblem`}
-             width={64} height={64} className="h-14 w-14 md:h-16 md:w-16" />
+        <img
+          src={cmPortrait}
+          alt="Hon'ble Chief Minister of Telangana"
+          width={72}
+          height={72}
+          className="h-16 w-16 md:h-20 md:w-20 rounded-full object-cover border-2 border-gov-saffron shadow"
+        />
         <div className="flex-1 min-w-0">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">
             Government of Telangana · {ulb.type ?? "Municipality"}
@@ -37,6 +45,22 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
           <p className="text-xs text-muted-foreground hidden md:block">
             Office of the Commissioner · ULB Code {ulb.code}
           </p>
+        </div>
+        <div className="hidden sm:flex items-center gap-3 shrink-0">
+          <img
+            src={telanganaLogo}
+            alt="Government of Telangana emblem"
+            width={64}
+            height={64}
+            className="h-14 w-14 md:h-16 md:w-16 object-contain"
+          />
+          <img
+            src={risingLogo}
+            alt="Telangana Rising 2047"
+            width={64}
+            height={64}
+            className="h-14 w-14 md:h-16 md:w-16 object-contain"
+          />
         </div>
         <button
           aria-label="Toggle menu"
