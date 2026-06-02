@@ -5,10 +5,7 @@ import { Ticker } from "@/components/site/Ticker";
 import { OnlineServices } from "@/components/site/OnlineServices";
 import hero from "@/assets/hero-default.jpg";
 import cmPortrait from "@/assets/cm-portrait.png";
-import {
-  FileText, Receipt, ScrollText, Hammer, Camera, Building2,
-  AlertCircle, Phone, ArrowRight, Users, MapPin, Calendar, Landmark, Target, Eye,
-} from "lucide-react";
+import { ArrowRight, Users, MapPin, Calendar, Landmark, Target, Eye } from "lucide-react";
 import type { News, Notice, Banner, Leadership } from "@/lib/ulb-types";
 
 export const Route = createFileRoute("/$slug/")({
