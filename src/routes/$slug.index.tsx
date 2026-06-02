@@ -7,7 +7,7 @@ import hero from "@/assets/hero-default.jpg";
 import cmPortrait from "@/assets/cm-portrait.png";
 import {
   FileText, Receipt, ScrollText, Hammer, Camera, Building2,
-  AlertCircle, Phone, ArrowRight,
+  AlertCircle, Phone, ArrowRight, Users, MapPin, Calendar, Landmark, Target, Eye,
 } from "lucide-react";
 import type { News, Notice, Banner, Leadership } from "@/lib/ulb-types";
 
@@ -30,17 +30,6 @@ export const Route = createFileRoute("/$slug/")({
   },
   component: UlbHome,
 });
-
-const QUICK = [
-  { icon: Receipt, label: "Property Tax", to: "property-tax" },
-  { icon: FileText, label: "Trade License", to: "trade-license" },
-  { icon: ScrollText, label: "Birth & Death", to: "certificates" },
-  { icon: Building2, label: "Building Permit", to: "building-permit" },
-  { icon: Hammer, label: "Tenders", to: "tenders" },
-  { icon: AlertCircle, label: "Grievance", to: "grievance" },
-  { icon: Camera, label: "Gallery", to: "gallery" },
-  { icon: Phone, label: "Contact", to: "contact" },
-];
 
 function UlbHome() {
   const ulb = useUlb();
@@ -88,15 +77,57 @@ function UlbHome() {
       </section>
 
       {/* Quick Services */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
-          {QUICK.map((q) => (
-            <Link key={q.label} to="/$slug/services" params={{ slug: ulb.slug }}
-                  className="bg-card border rounded-lg p-4 text-center hover:border-gov-green hover:shadow-[var(--shadow-elegant)] transition group">
-              <q.icon className="h-7 w-7 mx-auto text-gov-green group-hover:scale-110 transition" />
-              <p className="text-xs font-medium mt-2">{q.label}</p>
-            </Link>
+      {/* Municipality at a Glance — replaces generic quick links */}
+      <section className="container mx-auto px-4 py-14">
+        <div className="text-center mb-10">
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-accent">Know Your City</p>
+          <h2 className="font-display text-3xl md:text-4xl font-black text-gov-navy mt-2">
+            {ulb.name} at a Glance
+          </h2>
+          <div className="mx-auto mt-3 h-1 w-20 bg-gradient-to-r from-gov-saffron via-white to-gov-green rounded-full" />
+        </div>
+
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4 mb-10">
+          {[
+            { icon: Users, label: "Population", value: ulb.population ? ulb.population.toLocaleString("en-IN") : "—" },
+            { icon: MapPin, label: "Area", value: ulb.area_sqkm ? `${ulb.area_sqkm} km²` : "—" },
+            { icon: Calendar, label: "Established", value: ulb.established_year ?? "—" },
+            { icon: Landmark, label: "District", value: ulb.district ?? ulb.type ?? "—" },
+          ].map((s) => (
+            <div key={s.label} className="bg-card border rounded-xl p-5 text-center hover:border-gov-green hover:shadow-[var(--shadow-elegant)] transition">
+              <s.icon className="h-8 w-8 mx-auto text-gov-green" />
+              <p className="font-display text-2xl font-black text-gov-navy mt-3">{s.value}</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1">{s.label}</p>
+            </div>
           ))}
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          {ulb.about && (
+            <div className="lg:col-span-1 bg-gradient-to-br from-gov-navy to-gov-navy/90 text-primary-foreground rounded-xl p-6">
+              <p className="text-xs font-bold uppercase tracking-widest text-gov-saffron">About</p>
+              <h3 className="font-display text-2xl font-black mt-2">{ulb.name}</h3>
+              <p className="text-sm mt-3 opacity-90 line-clamp-6">{ulb.about}</p>
+              <Link to="/$slug/about" params={{ slug: ulb.slug }}
+                    className="inline-flex items-center gap-1 mt-4 text-sm font-bold text-gov-saffron hover:underline">
+                Read more <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
+          {ulb.vision && (
+            <div className="bg-card border-l-4 border-gov-green rounded-xl p-6 shadow-sm">
+              <Eye className="h-7 w-7 text-gov-green" />
+              <p className="text-xs font-bold uppercase tracking-widest text-accent mt-3">Our Vision</p>
+              <p className="text-sm text-foreground/80 mt-2 italic">{ulb.vision}</p>
+            </div>
+          )}
+          {ulb.mission && (
+            <div className="bg-card border-l-4 border-gov-saffron rounded-xl p-6 shadow-sm">
+              <Target className="h-7 w-7 text-gov-saffron" />
+              <p className="text-xs font-bold uppercase tracking-widest text-accent mt-3">Our Mission</p>
+              <p className="text-sm text-foreground/80 mt-2 italic">{ulb.mission}</p>
+            </div>
+          )}
         </div>
       </section>
 
