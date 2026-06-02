@@ -36,7 +36,7 @@ export function OnlineServices({ services = DEFAULT_ONLINE_SERVICES }: { service
   const centerIdx = Math.floor(visible / 2);
 
   return (
-    <section className="relative bg-gov-cream/40 border-y">
+    <section id="online-services" className="relative bg-gov-cream/40 border-y scroll-mt-24">
       <div className="container mx-auto px-4 py-14">
         <div className="text-center mb-8">
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-accent">Citizen Portal</p>
