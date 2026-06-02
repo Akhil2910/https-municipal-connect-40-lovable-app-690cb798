@@ -61,10 +61,10 @@ function UlbHome() {
             {top.subtitle ?? "Empowering citizens through transparent governance and digital services."}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link to="/$slug/services" params={{ slug: ulb.slug }}
-                  className="bg-accent text-accent-foreground px-6 py-3 rounded-md font-bold hover:opacity-90">
+            <a href="#online-services"
+               className="bg-accent text-accent-foreground px-6 py-3 rounded-md font-bold hover:opacity-90">
               Explore Citizen Services
-            </Link>
+            </a>
             <Link to="/$slug/grievance" params={{ slug: ulb.slug }}
                   className="bg-white/10 backdrop-blur border border-white/30 px-6 py-3 rounded-md font-bold hover:bg-white/20">
               Lodge a Grievance
