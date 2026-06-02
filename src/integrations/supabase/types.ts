@@ -21,6 +21,7 @@ export type Database = {
           image_url: string
           is_active: boolean
           link_url: string | null
+          slug: string | null
           sort_order: number
           subtitle: string | null
           title: string | null
@@ -32,6 +33,7 @@ export type Database = {
           image_url: string
           is_active?: boolean
           link_url?: string | null
+          slug?: string | null
           sort_order?: number
           subtitle?: string | null
           title?: string | null
@@ -43,6 +45,7 @@ export type Database = {
           image_url?: string
           is_active?: boolean
           link_url?: string | null
+          slug?: string | null
           sort_order?: number
           subtitle?: string | null
           title?: string | null
@@ -67,6 +70,7 @@ export type Database = {
           id: string
           name: string
           phone: string | null
+          slug: string | null
           ulb_id: string
         }
         Insert: {
@@ -77,6 +81,7 @@ export type Database = {
           id?: string
           name: string
           phone?: string | null
+          slug?: string | null
           ulb_id: string
         }
         Update: {
@@ -87,6 +92,7 @@ export type Database = {
           id?: string
           name?: string
           phone?: string | null
+          slug?: string | null
           ulb_id?: string
         }
         Relationships: [
@@ -106,6 +112,7 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
+          slug: string | null
           ulb_id: string
         }
         Insert: {
@@ -114,6 +121,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url: string
+          slug?: string | null
           ulb_id: string
         }
         Update: {
@@ -122,6 +130,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string
+          slug?: string | null
           ulb_id?: string
         }
         Relationships: [
@@ -198,6 +207,7 @@ export type Database = {
           name: string
           photo_url: string | null
           role: string
+          slug: string | null
           sort_order: number
           ulb_id: string
         }
@@ -208,6 +218,7 @@ export type Database = {
           name: string
           photo_url?: string | null
           role: string
+          slug?: string | null
           sort_order?: number
           ulb_id: string
         }
@@ -218,6 +229,7 @@ export type Database = {
           name?: string
           photo_url?: string | null
           role?: string
+          slug?: string | null
           sort_order?: number
           ulb_id?: string
         }
@@ -239,6 +251,7 @@ export type Database = {
           image_url: string | null
           is_published: boolean
           published_at: string
+          slug: string | null
           summary: string | null
           title: string
           ulb_id: string
@@ -250,6 +263,7 @@ export type Database = {
           image_url?: string | null
           is_published?: boolean
           published_at?: string
+          slug?: string | null
           summary?: string | null
           title: string
           ulb_id: string
@@ -261,6 +275,7 @@ export type Database = {
           image_url?: string | null
           is_published?: boolean
           published_at?: string
+          slug?: string | null
           summary?: string | null
           title?: string
           ulb_id?: string
@@ -282,6 +297,7 @@ export type Database = {
           file_url: string | null
           id: string
           notice_date: string
+          slug: string | null
           title: string
           ulb_id: string
         }
@@ -291,6 +307,7 @@ export type Database = {
           file_url?: string | null
           id?: string
           notice_date?: string
+          slug?: string | null
           title: string
           ulb_id: string
         }
@@ -300,6 +317,7 @@ export type Database = {
           file_url?: string | null
           id?: string
           notice_date?: string
+          slug?: string | null
           title?: string
           ulb_id?: string
         }
@@ -370,6 +388,7 @@ export type Database = {
           last_date: string | null
           published_date: string
           reference_no: string | null
+          slug: string | null
           status: string
           title: string
           ulb_id: string
@@ -383,6 +402,7 @@ export type Database = {
           last_date?: string | null
           published_date?: string
           reference_no?: string | null
+          slug?: string | null
           status?: string
           title: string
           ulb_id: string
@@ -396,6 +416,7 @@ export type Database = {
           last_date?: string | null
           published_date?: string
           reference_no?: string | null
+          slug?: string | null
           status?: string
           title?: string
           ulb_id?: string
