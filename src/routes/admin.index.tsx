@@ -55,6 +55,7 @@ function AdminDashboard() {
 
   const newsFields: FieldDef[] = [
     { name: "title", label: "Title", type: "text", required: true },
+    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "summary", label: "Summary", type: "textarea" },
     { name: "body", label: "Body", type: "textarea" },
     { name: "image_url", label: "Image URL", type: "text" },
@@ -62,12 +63,14 @@ function AdminDashboard() {
   ];
   const noticesFields: FieldDef[] = [
     { name: "title", label: "Title", type: "text", required: true },
+    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "category", label: "Category", type: "text" },
     { name: "notice_date", label: "Date", type: "date" },
     { name: "file_url", label: "File URL", type: "text" },
   ];
   const bannersFields: FieldDef[] = [
     { name: "title", label: "Title", type: "text" },
+    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "subtitle", label: "Subtitle", type: "text" },
     { name: "image_url", label: "Image URL", type: "text", required: true },
     { name: "link_url", label: "Link URL", type: "text" },
@@ -76,6 +79,7 @@ function AdminDashboard() {
   ];
   const tendersFields: FieldDef[] = [
     { name: "title", label: "Title", type: "text", required: true },
+    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "reference_no", label: "Reference No", type: "text" },
     { name: "category", label: "Category", type: "text" },
     { name: "description", label: "Description", type: "textarea" },
@@ -86,6 +90,7 @@ function AdminDashboard() {
   ];
   const leadershipFields: FieldDef[] = [
     { name: "name", label: "Name", type: "text", required: true },
+    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "role", label: "Role", type: "text", required: true },
     { name: "photo_url", label: "Photo URL", type: "text" },
     { name: "message", label: "Message", type: "textarea" },
@@ -93,6 +98,7 @@ function AdminDashboard() {
   ];
   const deptFields: FieldDef[] = [
     { name: "name", label: "Name", type: "text", required: true },
+    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "head_name", label: "Head", type: "text" },
     { name: "description", label: "Description", type: "textarea" },
     { name: "phone", label: "Phone", type: "text" },
@@ -100,6 +106,7 @@ function AdminDashboard() {
   ];
   const galleryFields: FieldDef[] = [
     { name: "image_url", label: "Image URL", type: "text", required: true },
+    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "caption", label: "Caption", type: "text" },
     { name: "category", label: "Category", type: "text" },
   ];
