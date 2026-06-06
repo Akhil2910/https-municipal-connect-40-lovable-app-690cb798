@@ -5,7 +5,7 @@ import { Ticker } from "@/components/site/Ticker";
 import { OnlineServices } from "@/components/site/OnlineServices";
 import hero from "@/assets/hero-default.jpg";
 import cmPortrait from "@/assets/cm-portrait.png";
-import { ArrowRight, Users, MapPin, Calendar, Landmark, Target, Eye } from "lucide-react";
+import { ArrowRight, Users, MapPin, Calendar, Landmark, Target, Eye, Map as MapIcon } from "lucide-react";
 import type { News, Notice, Banner, Leadership } from "@/lib/ulb-types";
 
 export const Route = createFileRoute("/$slug/")({
@@ -149,6 +149,31 @@ function UlbHome() {
               {cm?.message ?? `Together, we are building a model municipality at ${ulb.name} — efficient, accountable and citizen-centric.`}
             </blockquote>
           </div>
+        </div>
+      </section>
+
+      {/* Location Map */}
+      <section className="container mx-auto px-4 py-14">
+        <div className="text-center mb-8">
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-accent">Find Us</p>
+          <h2 className="font-display text-3xl md:text-4xl font-black text-gov-navy mt-2 flex items-center justify-center gap-2">
+            <MapIcon className="h-7 w-7 text-gov-green" /> Location of {ulb.name}
+          </h2>
+          <div className="mx-auto mt-3 h-1 w-20 bg-gradient-to-r from-gov-saffron via-white to-gov-green rounded-full" />
+          {ulb.address && <p className="text-sm text-muted-foreground mt-3 max-w-2xl mx-auto">{ulb.address}</p>}
+        </div>
+        <div className="rounded-xl overflow-hidden border shadow-[var(--shadow-elegant)] aspect-[16/8] bg-muted">
+          <iframe
+            title={`Map of ${ulb.name}`}
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(
+              [ulb.address, ulb.name, ulb.district, ulb.state ?? "Telangana", "India"].filter(Boolean).join(", ")
+            )}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+            width="100%"
+            height="100%"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="w-full h-full border-0"
+          />
         </div>
       </section>
 
