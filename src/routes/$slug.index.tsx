@@ -152,6 +152,31 @@ function UlbHome() {
         </div>
       </section>
 
+      {/* Location Map */}
+      <section className="container mx-auto px-4 py-14">
+        <div className="text-center mb-8">
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-accent">Find Us</p>
+          <h2 className="font-display text-3xl md:text-4xl font-black text-gov-navy mt-2 flex items-center justify-center gap-2">
+            <MapIcon className="h-7 w-7 text-gov-green" /> Location of {ulb.name}
+          </h2>
+          <div className="mx-auto mt-3 h-1 w-20 bg-gradient-to-r from-gov-saffron via-white to-gov-green rounded-full" />
+          {ulb.address && <p className="text-sm text-muted-foreground mt-3 max-w-2xl mx-auto">{ulb.address}</p>}
+        </div>
+        <div className="rounded-xl overflow-hidden border shadow-[var(--shadow-elegant)] aspect-[16/8] bg-muted">
+          <iframe
+            title={`Map of ${ulb.name}`}
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(
+              [ulb.address, ulb.name, ulb.district, ulb.state ?? "Telangana", "India"].filter(Boolean).join(", ")
+            )}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+            width="100%"
+            height="100%"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="w-full h-full border-0"
+          />
+        </div>
+      </section>
+
       {/* News + Notices */}
       <section className="container mx-auto px-4 py-16 grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
