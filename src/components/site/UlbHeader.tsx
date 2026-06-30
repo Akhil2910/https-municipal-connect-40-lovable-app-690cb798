@@ -3,6 +3,7 @@ import emblem from "@/assets/ulb-emblem.png";
 import cmPortrait from "@/assets/cm-portrait.png";
 import telanganaLogo from "@/assets/telangana-logo.jpg";
 import risingLogo from "@/assets/rising-2047.png";
+import sridevi from "@/assets/tk-sridevi.webp.asset.json";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import type { Ulb } from "@/lib/ulb-types";
@@ -54,13 +55,34 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
             Office of the Commissioner · ULB Code {ulb.code}
           </p>
         </div>
-        <img
-          src={cmPortrait}
-          alt="Hon'ble Chief Minister of Telangana"
-          width={72}
-          height={72}
-          className="hidden sm:block h-16 w-16 md:h-20 md:w-20 rounded-full object-cover border-2 border-gov-saffron shadow shrink-0"
-        />
+        <div className="hidden md:flex items-center gap-4 shrink-0">
+          <figure className="flex flex-col items-center w-28">
+            <img
+              src={sridevi.url}
+              alt="Dr. T.K. Sreedevi IAS"
+              width={72}
+              height={72}
+              className="h-16 w-16 md:h-20 md:w-20 rounded-full object-cover object-top aspect-square border-2 border-gov-green shadow"
+            />
+            <figcaption className="mt-1 text-center leading-tight">
+              <p className="text-[10px] font-bold text-gov-navy">Dr. T.K. Sreedevi IAS</p>
+              <p className="text-[9px] text-muted-foreground">Secy. MA Dept. &amp; CDMA</p>
+            </figcaption>
+          </figure>
+          <figure className="flex flex-col items-center w-28">
+            <img
+              src={cmPortrait}
+              alt="Sri A. Revanth Reddy, Hon'ble Chief Minister"
+              width={72}
+              height={72}
+              className="h-16 w-16 md:h-20 md:w-20 rounded-full object-cover object-top aspect-square border-2 border-gov-saffron shadow"
+            />
+            <figcaption className="mt-1 text-center leading-tight">
+              <p className="text-[10px] font-bold text-gov-navy">Sri A. Revanth Reddy</p>
+              <p className="text-[9px] text-muted-foreground">Hon'ble Chief Minister</p>
+            </figcaption>
+          </figure>
+        </div>
         <button
           aria-label="Toggle menu"
           onClick={() => setOpen((v) => !v)}
