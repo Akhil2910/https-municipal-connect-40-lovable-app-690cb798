@@ -86,6 +86,14 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
             </li>
           ))}
         </ul>
+        <a
+          href="https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/hjhjhj"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden lg:block ml-auto px-4 py-3 text-sm font-bold bg-gov-saffron text-gov-navy hover:opacity-90 transition"
+        >
+          Ease of Doing Business ↗
+        </a>
       </nav>
     </header>
   );
