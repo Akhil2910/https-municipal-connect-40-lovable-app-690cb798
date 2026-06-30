@@ -85,6 +85,16 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
               </Link>
             </li>
           ))}
+          <li className="lg:ml-auto">
+            <a
+              href="https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/hjhjhj"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block px-4 py-3 text-sm font-bold bg-gov-saffron text-gov-navy hover:opacity-90 transition"
+            >
+              Ease of Doing Business ↗
+            </a>
+          </li>
         </ul>
       </nav>
     </header>
