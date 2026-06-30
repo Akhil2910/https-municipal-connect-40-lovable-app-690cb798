@@ -1,0 +1,1 @@
+UPDATE public.ulbs SET hero_image_url = '/__l5e/assets-v1/06e8833a-d7b2-44c1-997e-92d6b6853fd1/asifabad-hero.webp' WHERE slug = 'asifabad';
