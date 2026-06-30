@@ -13,7 +13,6 @@ const NAV = [
   { to: "/$slug/departments", label: "Departments" },
   { to: "/$slug/services", label: "Citizen Services" },
   { to: "/$slug/news", label: "News" },
-  { to: "/$slug/notices", label: "Notices" },
   { to: "/$slug/tenders", label: "Tenders" },
   { to: "/$slug/gallery", label: "Gallery" },
   { to: "/$slug/grievance", label: "Grievance" },
