@@ -34,7 +34,7 @@ function UlbHome() {
     banners: Banner[]; news: News[]; notices: Notice[]; leadership: Leadership[];
   };
   const slides = banners.length ? banners : [{
-    id: "default", image_url: hero,
+    id: "default", image_url: ulb.hero_image_url ?? hero,
     title: `Welcome to ${ulb.name} ${ulb.type ?? "Municipality"}`,
     subtitle: "Building a transparent, citizen-first urban future.",
     link_url: null,
