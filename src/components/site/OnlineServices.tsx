@@ -24,7 +24,7 @@ export const DEFAULT_ONLINE_SERVICES: OnlineService[] = [
   { label: "Road Cutting Permission",      icon: Construction,   url: "https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/sdfsfsdfsdf" },
   { label: "Grievances",                   icon: AlertCircle,    url: "https://egovindia.in/ulbwisecomplaints/index.php" },
   { label: "Unified Birth & Death",        icon: Baby,           url: "https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/mnmbnmnbmnbm" },
-  { label: "Ease of Doing Business",       icon: Briefcase,      url: "https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/hjhjhj" },
+  { label: "Ease of Doing Business",       icon: Briefcase,      url: "https://cdma.cgg.gov.in/EoDB" },
 ];
 
 export function OnlineServices({ services = DEFAULT_ONLINE_SERVICES }: { services?: OnlineService[] }) {
