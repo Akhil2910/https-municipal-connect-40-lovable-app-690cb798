@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUlb } from "./$slug";
 import { Ticker } from "@/components/site/Ticker";
 import { OnlineServices } from "@/components/site/OnlineServices";
+import { WeatherPanel } from "@/components/site/WeatherPanel";
 import hero from "@/assets/hero-default.jpg";
 import cmPortrait from "@/assets/cm-portrait.png";
 import { ArrowRight, Users, MapPin, Calendar, Landmark, Target, Eye, Map as MapIcon } from "lucide-react";
@@ -162,18 +163,21 @@ function UlbHome() {
           <div className="mx-auto mt-3 h-1 w-20 bg-gradient-to-r from-gov-saffron via-white to-gov-green rounded-full" />
           {ulb.address && <p className="text-sm text-muted-foreground mt-3 max-w-2xl mx-auto">{ulb.address}</p>}
         </div>
-        <div className="rounded-xl overflow-hidden border shadow-[var(--shadow-elegant)] aspect-[16/8] bg-muted">
-          <iframe
-            title={`Map of ${ulb.name}`}
-            src={`https://maps.google.com/maps?q=${encodeURIComponent(
-              [ulb.address, ulb.name, ulb.district, ulb.state ?? "Telangana", "India"].filter(Boolean).join(", ")
-            )}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
-            width="100%"
-            height="100%"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="w-full h-full border-0"
-          />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-xl overflow-hidden border shadow-[var(--shadow-elegant)] aspect-[16/10] lg:aspect-auto lg:min-h-[520px] bg-muted">
+            <iframe
+              title={`Map of ${ulb.name}`}
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                [ulb.address, ulb.name, ulb.district, ulb.state ?? "Telangana", "India"].filter(Boolean).join(", ")
+              )}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+              width="100%"
+              height="100%"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full h-full border-0"
+            />
+          </div>
+          <WeatherPanel slug={ulb.slug} ulbName={ulb.name} />
         </div>
       </section>
 
