@@ -67,9 +67,7 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
             <figcaption className="mt-1 text-center leading-tight">
               <p className="text-[10px] font-bold text-gov-navy">Dr. T.K. Sreedevi IAS</p>
               <p className="text-[9px] text-muted-foreground">
-                Secretary to Government,<br />
-                Municipal Administration Department &amp;<br />
-                Commissioner and Director of Municipal Administration
+                Secretary to Government, MA Dept &amp; CDMA
               </p>
             </figcaption>
           </figure>
@@ -115,7 +113,7 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
           ))}
           <li className="lg:ml-auto">
             <a
-              href="https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/hjhjhj"
+              href="https://cdma.cgg.gov.in/EoDB"
               target="_blank"
               rel="noopener noreferrer"
               className="block px-4 py-3 text-sm font-bold bg-gov-saffron text-gov-navy hover:opacity-90 transition"
