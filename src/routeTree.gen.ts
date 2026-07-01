@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ScreenReaderRouteImport } from './routes/screen-reader'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -19,6 +20,11 @@ import { Route as SlugNewsRouteImport } from './routes/$slug.news'
 import { Route as SlugDepartmentsRouteImport } from './routes/$slug.departments'
 import { Route as SlugAboutRouteImport } from './routes/$slug.about'
 
+const ScreenReaderRoute = ScreenReaderRouteImport.update({
+  id: '/screen-reader',
+  path: '/screen-reader',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlugRoute = SlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -68,6 +74,7 @@ const SlugAboutRoute = SlugAboutRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRouteWithChildren
+  '/screen-reader': typeof ScreenReaderRoute
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug/news': typeof SlugNewsRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/screen-reader': typeof ScreenReaderRoute
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug/news': typeof SlugNewsRoute
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$slug': typeof SlugRouteWithChildren
+  '/screen-reader': typeof ScreenReaderRoute
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug/news': typeof SlugNewsRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$slug'
+    | '/screen-reader'
     | '/$slug/about'
     | '/$slug/departments'
     | '/$slug/news'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/screen-reader'
     | '/$slug/about'
     | '/$slug/departments'
     | '/$slug/news'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$slug'
+    | '/screen-reader'
     | '/$slug/about'
     | '/$slug/departments'
     | '/$slug/news'
@@ -136,12 +148,20 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SlugRoute: typeof SlugRouteWithChildren
+  ScreenReaderRoute: typeof ScreenReaderRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/screen-reader': {
+      id: '/screen-reader'
+      path: '/screen-reader'
+      fullPath: '/screen-reader'
+      preLoaderRoute: typeof ScreenReaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$slug': {
       id: '/$slug'
       path: '/$slug'
@@ -229,6 +249,7 @@ const SlugRouteWithChildren = SlugRoute._addFileChildren(SlugRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SlugRoute: SlugRouteWithChildren,
+  ScreenReaderRoute: ScreenReaderRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
