@@ -12,11 +12,9 @@ const NAV = [
   { to: "/$slug", label: "Home" },
   { to: "/$slug/about", label: "About" },
   { to: "/$slug/departments", label: "Departments" },
-  { to: "/$slug/services", label: "Citizen Services" },
   { to: "/$slug/news", label: "News" },
   { to: "/$slug/tenders", label: "Tenders" },
   { to: "/$slug/gallery", label: "Gallery" },
-  { to: "/$slug/grievance", label: "Grievance" },
   { to: "/$slug/contact", label: "Contact" },
 ] as const;
 
@@ -111,6 +109,26 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
               </Link>
             </li>
           ))}
+          <li>
+            <a
+              href={`/${slug}#online-services`}
+              onClick={() => setOpen(false)}
+              className="block px-4 py-3 text-sm font-medium hover:bg-black/15 transition"
+            >
+              Citizen Services
+            </a>
+          </li>
+          <li>
+            <Link
+              to="/$slug/grievance"
+              params={{ slug }}
+              onClick={() => setOpen(false)}
+              className="block px-4 py-3 text-sm font-medium hover:bg-black/15 transition"
+              activeProps={{ className: "block px-4 py-3 text-sm font-bold bg-black/20" }}
+            >
+              Grievance
+            </Link>
+          </li>
           <li className="lg:ml-auto">
             <a
               href="https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/hjhjhj)]"
