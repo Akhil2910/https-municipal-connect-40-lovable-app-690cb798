@@ -66,7 +66,11 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
             />
             <figcaption className="mt-1 text-center leading-tight">
               <p className="text-[10px] font-bold text-gov-navy">Dr. T.K. Sreedevi IAS</p>
-              <p className="text-[9px] text-muted-foreground">Secy. MA Dept. &amp; CDMA</p>
+              <p className="text-[9px] text-muted-foreground">
+                Secretary to Government,<br />
+                Municipal Administration Department &amp;<br />
+                Commissioner and Director of Municipal Administration
+              </p>
             </figcaption>
           </figure>
           <figure className="flex flex-col items-center w-28">
@@ -79,7 +83,9 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
             />
             <figcaption className="mt-1 text-center leading-tight">
               <p className="text-[10px] font-bold text-gov-navy">Sri A. Revanth Reddy</p>
-              <p className="text-[9px] text-muted-foreground">Hon'ble Chief Minister</p>
+              <p className="text-[9px] text-muted-foreground">
+                Hon'ble Chief Minister,<br />Government of Telangana
+              </p>
             </figcaption>
           </figure>
         </div>
