@@ -1,16 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getUlbWeather } from "@/lib/weather.functions";
 import { Cloud, Droplets, Wind, Thermometer, Sun, CloudRain, Gauge, Loader2 } from "lucide-react";
 
 export function WeatherPanel({ slug, ulbName }: { slug: string; ulbName: string }) {
   const fn = useServerFn(getUlbWeather);
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["ulb-weather", slug],
-    queryFn: () => fn({ data: { slug } }),
-    staleTime: 10 * 60_000,
-    refetchOnWindowFocus: false,
-  });
+  const [data, setData] = useState<Awaited<ReturnType<typeof fn>> | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<unknown>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    fn({ data: { slug } })
+      .then((res) => { if (!cancelled) { setData(res); setError(null); } })
+      .catch((e) => { if (!cancelled) setError(e); })
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
+  }, [slug]);
 
   return (
     <div className="rounded-xl overflow-hidden border shadow-[var(--shadow-elegant)] bg-gradient-to-br from-gov-navy via-gov-navy to-[hsl(215,60%,18%)] text-white flex flex-col">
