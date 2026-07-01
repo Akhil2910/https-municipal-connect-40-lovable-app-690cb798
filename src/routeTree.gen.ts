@@ -17,6 +17,7 @@ import { Route as SlugIndexRouteImport } from './routes/$slug.index'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as SlugNoticesRouteImport } from './routes/$slug.notices'
 import { Route as SlugNewsRouteImport } from './routes/$slug.news'
+import { Route as SlugGrievanceRouteImport } from './routes/$slug.grievance'
 import { Route as SlugDepartmentsRouteImport } from './routes/$slug.departments'
 import { Route as SlugAboutRouteImport } from './routes/$slug.about'
 
@@ -60,6 +61,11 @@ const SlugNewsRoute = SlugNewsRouteImport.update({
   path: '/news',
   getParentRoute: () => SlugRoute,
 } as any)
+const SlugGrievanceRoute = SlugGrievanceRouteImport.update({
+  id: '/grievance',
+  path: '/grievance',
+  getParentRoute: () => SlugRoute,
+} as any)
 const SlugDepartmentsRoute = SlugDepartmentsRouteImport.update({
   id: '/departments',
   path: '/departments',
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/screen-reader': typeof ScreenReaderRoute
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/grievance': typeof SlugGrievanceRoute
   '/$slug/news': typeof SlugNewsRoute
   '/$slug/notices': typeof SlugNoticesRoute
   '/admin/login': typeof AdminLoginRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/screen-reader': typeof ScreenReaderRoute
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/grievance': typeof SlugGrievanceRoute
   '/$slug/news': typeof SlugNewsRoute
   '/$slug/notices': typeof SlugNoticesRoute
   '/admin/login': typeof AdminLoginRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/screen-reader': typeof ScreenReaderRoute
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/grievance': typeof SlugGrievanceRoute
   '/$slug/news': typeof SlugNewsRoute
   '/$slug/notices': typeof SlugNoticesRoute
   '/admin/login': typeof AdminLoginRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/screen-reader'
     | '/$slug/about'
     | '/$slug/departments'
+    | '/$slug/grievance'
     | '/$slug/news'
     | '/$slug/notices'
     | '/admin/login'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/screen-reader'
     | '/$slug/about'
     | '/$slug/departments'
+    | '/$slug/grievance'
     | '/$slug/news'
     | '/$slug/notices'
     | '/admin/login'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/screen-reader'
     | '/$slug/about'
     | '/$slug/departments'
+    | '/$slug/grievance'
     | '/$slug/news'
     | '/$slug/notices'
     | '/admin/login'
@@ -211,6 +223,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugNewsRouteImport
       parentRoute: typeof SlugRoute
     }
+    '/$slug/grievance': {
+      id: '/$slug/grievance'
+      path: '/grievance'
+      fullPath: '/$slug/grievance'
+      preLoaderRoute: typeof SlugGrievanceRouteImport
+      parentRoute: typeof SlugRoute
+    }
     '/$slug/departments': {
       id: '/$slug/departments'
       path: '/departments'
@@ -231,6 +250,7 @@ declare module '@tanstack/react-router' {
 interface SlugRouteChildren {
   SlugAboutRoute: typeof SlugAboutRoute
   SlugDepartmentsRoute: typeof SlugDepartmentsRoute
+  SlugGrievanceRoute: typeof SlugGrievanceRoute
   SlugNewsRoute: typeof SlugNewsRoute
   SlugNoticesRoute: typeof SlugNoticesRoute
   SlugIndexRoute: typeof SlugIndexRoute
@@ -239,6 +259,7 @@ interface SlugRouteChildren {
 const SlugRouteChildren: SlugRouteChildren = {
   SlugAboutRoute: SlugAboutRoute,
   SlugDepartmentsRoute: SlugDepartmentsRoute,
+  SlugGrievanceRoute: SlugGrievanceRoute,
   SlugNewsRoute: SlugNewsRoute,
   SlugNoticesRoute: SlugNoticesRoute,
   SlugIndexRoute: SlugIndexRoute,
