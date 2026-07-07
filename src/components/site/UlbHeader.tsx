@@ -103,7 +103,7 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
         </button>
       </div>
       <nav className="bg-gov-green text-primary-foreground">
-        <ul className={`container mx-auto px-4 ${open ? "block" : "hidden"} lg:flex flex-wrap`}>
+        <ul className={`container mx-auto px-4 ${open ? "block" : "hidden"} lg:flex lg:items-center`}>
           {NAV.slice(0, 1).map((item) => (
             <li key={item.to}>
               <Link
