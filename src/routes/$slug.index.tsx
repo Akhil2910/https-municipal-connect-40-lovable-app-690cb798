@@ -5,7 +5,6 @@ import { Ticker } from "@/components/site/Ticker";
 import { OnlineServices } from "@/components/site/OnlineServices";
 import { WeatherPanel } from "@/components/site/WeatherPanel";
 import hero from "@/assets/hero-default.jpg";
-import cmPortrait from "@/assets/cm-portrait.png";
 import { ArrowRight, Users, MapPin, Calendar, Landmark, Target, Eye, Map as MapIcon } from "lucide-react";
 import type { News, Notice, Banner, Leadership } from "@/lib/ulb-types";
 
@@ -43,6 +42,7 @@ function UlbHome() {
   const top = slides[0];
   const cm = leadership.find((l) => l.role.toLowerCase().includes("chief minister")) ?? null;
   const others = leadership.filter((l) => l !== cm).slice(0, 3);
+  void cm;
 
   return (
     <>
@@ -131,27 +131,6 @@ function UlbHome() {
 
       {/* Online Services Carousel */}
       <OnlineServices />
-
-      {/* CM / Leadership Banner */}
-      <section className="bg-gov-cream border-y">
-        <div className="container mx-auto px-4 py-12 grid gap-8 md:grid-cols-[280px_1fr] items-center">
-          <div className="relative">
-            <div className="absolute -inset-2 bg-gradient-to-br from-gov-saffron to-gov-green opacity-20 rounded-lg" />
-            <img src={cm?.photo_url || cmPortrait} alt={cm?.name ?? "Chief Minister"}
-                 width={280} height={350} className="relative w-full max-w-[280px] mx-auto rounded-lg object-cover shadow-[var(--shadow-elegant)]" />
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-accent">Message</p>
-            <h3 className="font-display text-3xl font-black text-gov-navy mt-1">
-              {cm?.name ?? "Hon'ble Chief Minister"}
-            </h3>
-            <p className="text-sm text-muted-foreground">{cm?.role ?? "Chief Minister, Government of Telangana"}</p>
-            <blockquote className="mt-4 border-l-4 border-gov-saffron pl-4 italic text-foreground/80">
-              {cm?.message ?? `Together, we are building a model municipality at ${ulb.name} — efficient, accountable and citizen-centric.`}
-            </blockquote>
-          </div>
-        </div>
-      </section>
 
       {/* Location Map */}
       <section className="container mx-auto px-4 py-14">
