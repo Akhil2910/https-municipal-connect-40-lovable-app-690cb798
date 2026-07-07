@@ -16,8 +16,8 @@ export const Route = createFileRoute("/$slug/about")({
 
 function About() {
   const ulb = useUlb();
-  const { leadership } = Route.useLoaderData();
-  const cm = leadership.find((l) => l.role.toLowerCase().includes("chief minister")) ?? null;
+  const { leadership } = Route.useLoaderData() as { leadership: Leadership[] };
+  const cm = leadership.find((l: Leadership) => l.role.toLowerCase().includes("chief minister")) ?? null;
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <h1 className="font-display text-4xl font-black text-gov-navy">About {ulb.name}</h1>
