@@ -15,10 +15,16 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as SlugPublicRepresentativesRouteImport } from './routes/$slug.public-representatives'
+import { Route as SlugOrganizationalChartRouteImport } from './routes/$slug.organizational-chart'
 import { Route as SlugNoticesRouteImport } from './routes/$slug.notices'
 import { Route as SlugNewsRouteImport } from './routes/$slug.news'
+import { Route as SlugMediaCoverageRouteImport } from './routes/$slug.media-coverage'
 import { Route as SlugGrievanceRouteImport } from './routes/$slug.grievance'
 import { Route as SlugDepartmentsRouteImport } from './routes/$slug.departments'
+import { Route as SlugCouncilRouteImport } from './routes/$slug.council'
+import { Route as SlugCoOptionMembersRouteImport } from './routes/$slug.co-option-members'
+import { Route as SlugChairpersonRouteImport } from './routes/$slug.chairperson'
 import { Route as SlugAboutRouteImport } from './routes/$slug.about'
 
 const ScreenReaderRoute = ScreenReaderRouteImport.update({
@@ -51,6 +57,17 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugPublicRepresentativesRoute =
+  SlugPublicRepresentativesRouteImport.update({
+    id: '/public-representatives',
+    path: '/public-representatives',
+    getParentRoute: () => SlugRoute,
+  } as any)
+const SlugOrganizationalChartRoute = SlugOrganizationalChartRouteImport.update({
+  id: '/organizational-chart',
+  path: '/organizational-chart',
+  getParentRoute: () => SlugRoute,
+} as any)
 const SlugNoticesRoute = SlugNoticesRouteImport.update({
   id: '/notices',
   path: '/notices',
@@ -61,6 +78,11 @@ const SlugNewsRoute = SlugNewsRouteImport.update({
   path: '/news',
   getParentRoute: () => SlugRoute,
 } as any)
+const SlugMediaCoverageRoute = SlugMediaCoverageRouteImport.update({
+  id: '/media-coverage',
+  path: '/media-coverage',
+  getParentRoute: () => SlugRoute,
+} as any)
 const SlugGrievanceRoute = SlugGrievanceRouteImport.update({
   id: '/grievance',
   path: '/grievance',
@@ -69,6 +91,21 @@ const SlugGrievanceRoute = SlugGrievanceRouteImport.update({
 const SlugDepartmentsRoute = SlugDepartmentsRouteImport.update({
   id: '/departments',
   path: '/departments',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugCouncilRoute = SlugCouncilRouteImport.update({
+  id: '/council',
+  path: '/council',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugCoOptionMembersRoute = SlugCoOptionMembersRouteImport.update({
+  id: '/co-option-members',
+  path: '/co-option-members',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugChairpersonRoute = SlugChairpersonRouteImport.update({
+  id: '/chairperson',
+  path: '/chairperson',
   getParentRoute: () => SlugRoute,
 } as any)
 const SlugAboutRoute = SlugAboutRouteImport.update({
@@ -82,10 +119,16 @@ export interface FileRoutesByFullPath {
   '/$slug': typeof SlugRouteWithChildren
   '/screen-reader': typeof ScreenReaderRoute
   '/$slug/about': typeof SlugAboutRoute
+  '/$slug/chairperson': typeof SlugChairpersonRoute
+  '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
+  '/$slug/council': typeof SlugCouncilRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug/grievance': typeof SlugGrievanceRoute
+  '/$slug/media-coverage': typeof SlugMediaCoverageRoute
   '/$slug/news': typeof SlugNewsRoute
   '/$slug/notices': typeof SlugNoticesRoute
+  '/$slug/organizational-chart': typeof SlugOrganizationalChartRoute
+  '/$slug/public-representatives': typeof SlugPublicRepresentativesRoute
   '/admin/login': typeof AdminLoginRoute
   '/$slug/': typeof SlugIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -94,10 +137,16 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/screen-reader': typeof ScreenReaderRoute
   '/$slug/about': typeof SlugAboutRoute
+  '/$slug/chairperson': typeof SlugChairpersonRoute
+  '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
+  '/$slug/council': typeof SlugCouncilRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug/grievance': typeof SlugGrievanceRoute
+  '/$slug/media-coverage': typeof SlugMediaCoverageRoute
   '/$slug/news': typeof SlugNewsRoute
   '/$slug/notices': typeof SlugNoticesRoute
+  '/$slug/organizational-chart': typeof SlugOrganizationalChartRoute
+  '/$slug/public-representatives': typeof SlugPublicRepresentativesRoute
   '/admin/login': typeof AdminLoginRoute
   '/$slug': typeof SlugIndexRoute
   '/admin': typeof AdminIndexRoute
@@ -108,10 +157,16 @@ export interface FileRoutesById {
   '/$slug': typeof SlugRouteWithChildren
   '/screen-reader': typeof ScreenReaderRoute
   '/$slug/about': typeof SlugAboutRoute
+  '/$slug/chairperson': typeof SlugChairpersonRoute
+  '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
+  '/$slug/council': typeof SlugCouncilRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug/grievance': typeof SlugGrievanceRoute
+  '/$slug/media-coverage': typeof SlugMediaCoverageRoute
   '/$slug/news': typeof SlugNewsRoute
   '/$slug/notices': typeof SlugNoticesRoute
+  '/$slug/organizational-chart': typeof SlugOrganizationalChartRoute
+  '/$slug/public-representatives': typeof SlugPublicRepresentativesRoute
   '/admin/login': typeof AdminLoginRoute
   '/$slug/': typeof SlugIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -123,10 +178,16 @@ export interface FileRouteTypes {
     | '/$slug'
     | '/screen-reader'
     | '/$slug/about'
+    | '/$slug/chairperson'
+    | '/$slug/co-option-members'
+    | '/$slug/council'
     | '/$slug/departments'
     | '/$slug/grievance'
+    | '/$slug/media-coverage'
     | '/$slug/news'
     | '/$slug/notices'
+    | '/$slug/organizational-chart'
+    | '/$slug/public-representatives'
     | '/admin/login'
     | '/$slug/'
     | '/admin/'
@@ -135,10 +196,16 @@ export interface FileRouteTypes {
     | '/'
     | '/screen-reader'
     | '/$slug/about'
+    | '/$slug/chairperson'
+    | '/$slug/co-option-members'
+    | '/$slug/council'
     | '/$slug/departments'
     | '/$slug/grievance'
+    | '/$slug/media-coverage'
     | '/$slug/news'
     | '/$slug/notices'
+    | '/$slug/organizational-chart'
+    | '/$slug/public-representatives'
     | '/admin/login'
     | '/$slug'
     | '/admin'
@@ -148,10 +215,16 @@ export interface FileRouteTypes {
     | '/$slug'
     | '/screen-reader'
     | '/$slug/about'
+    | '/$slug/chairperson'
+    | '/$slug/co-option-members'
+    | '/$slug/council'
     | '/$slug/departments'
     | '/$slug/grievance'
+    | '/$slug/media-coverage'
     | '/$slug/news'
     | '/$slug/notices'
+    | '/$slug/organizational-chart'
+    | '/$slug/public-representatives'
     | '/admin/login'
     | '/$slug/'
     | '/admin/'
@@ -209,6 +282,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug/public-representatives': {
+      id: '/$slug/public-representatives'
+      path: '/public-representatives'
+      fullPath: '/$slug/public-representatives'
+      preLoaderRoute: typeof SlugPublicRepresentativesRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/organizational-chart': {
+      id: '/$slug/organizational-chart'
+      path: '/organizational-chart'
+      fullPath: '/$slug/organizational-chart'
+      preLoaderRoute: typeof SlugOrganizationalChartRouteImport
+      parentRoute: typeof SlugRoute
+    }
     '/$slug/notices': {
       id: '/$slug/notices'
       path: '/notices'
@@ -221,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/news'
       fullPath: '/$slug/news'
       preLoaderRoute: typeof SlugNewsRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/media-coverage': {
+      id: '/$slug/media-coverage'
+      path: '/media-coverage'
+      fullPath: '/$slug/media-coverage'
+      preLoaderRoute: typeof SlugMediaCoverageRouteImport
       parentRoute: typeof SlugRoute
     }
     '/$slug/grievance': {
@@ -237,6 +331,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugDepartmentsRouteImport
       parentRoute: typeof SlugRoute
     }
+    '/$slug/council': {
+      id: '/$slug/council'
+      path: '/council'
+      fullPath: '/$slug/council'
+      preLoaderRoute: typeof SlugCouncilRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/co-option-members': {
+      id: '/$slug/co-option-members'
+      path: '/co-option-members'
+      fullPath: '/$slug/co-option-members'
+      preLoaderRoute: typeof SlugCoOptionMembersRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/chairperson': {
+      id: '/$slug/chairperson'
+      path: '/chairperson'
+      fullPath: '/$slug/chairperson'
+      preLoaderRoute: typeof SlugChairpersonRouteImport
+      parentRoute: typeof SlugRoute
+    }
     '/$slug/about': {
       id: '/$slug/about'
       path: '/about'
@@ -249,19 +364,31 @@ declare module '@tanstack/react-router' {
 
 interface SlugRouteChildren {
   SlugAboutRoute: typeof SlugAboutRoute
+  SlugChairpersonRoute: typeof SlugChairpersonRoute
+  SlugCoOptionMembersRoute: typeof SlugCoOptionMembersRoute
+  SlugCouncilRoute: typeof SlugCouncilRoute
   SlugDepartmentsRoute: typeof SlugDepartmentsRoute
   SlugGrievanceRoute: typeof SlugGrievanceRoute
+  SlugMediaCoverageRoute: typeof SlugMediaCoverageRoute
   SlugNewsRoute: typeof SlugNewsRoute
   SlugNoticesRoute: typeof SlugNoticesRoute
+  SlugOrganizationalChartRoute: typeof SlugOrganizationalChartRoute
+  SlugPublicRepresentativesRoute: typeof SlugPublicRepresentativesRoute
   SlugIndexRoute: typeof SlugIndexRoute
 }
 
 const SlugRouteChildren: SlugRouteChildren = {
   SlugAboutRoute: SlugAboutRoute,
+  SlugChairpersonRoute: SlugChairpersonRoute,
+  SlugCoOptionMembersRoute: SlugCoOptionMembersRoute,
+  SlugCouncilRoute: SlugCouncilRoute,
   SlugDepartmentsRoute: SlugDepartmentsRoute,
   SlugGrievanceRoute: SlugGrievanceRoute,
+  SlugMediaCoverageRoute: SlugMediaCoverageRoute,
   SlugNewsRoute: SlugNewsRoute,
   SlugNoticesRoute: SlugNoticesRoute,
+  SlugOrganizationalChartRoute: SlugOrganizationalChartRoute,
+  SlugPublicRepresentativesRoute: SlugPublicRepresentativesRoute,
   SlugIndexRoute: SlugIndexRoute,
 }
 

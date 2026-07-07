@@ -1,12 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useUlb } from "./$slug";
+import { supabase } from "@/integrations/supabase/client";
+import cmPortrait from "@/assets/cm-portrait.png";
+import type { Leadership } from "@/lib/ulb-types";
 
 export const Route = createFileRoute("/$slug/about")({
+  loader: async ({ params }) => {
+    const { data: ulb } = await supabase.from("ulbs").select("id").eq("slug", params.slug).single();
+    if (!ulb) return { leadership: [] as Leadership[] };
+    const { data } = await supabase.from("leadership").select("*").eq("ulb_id", ulb.id).order("sort_order");
+    return { leadership: (data ?? []) as Leadership[] };
+  },
   component: About,
 });
 
 function About() {
   const ulb = useUlb();
+  const { leadership } = Route.useLoaderData() as { leadership: Leadership[] };
+  const cm = leadership.find((l: Leadership) => l.role.toLowerCase().includes("chief minister")) ?? null;
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <h1 className="font-display text-4xl font-black text-gov-navy">About {ulb.name}</h1>
@@ -40,6 +51,34 @@ function About() {
           </div>
         ))}
       </div>
+
+      {/* Chief Minister's Message */}
+      <section className="mt-12 bg-gov-cream border rounded-xl overflow-hidden">
+        <div className="grid gap-6 md:grid-cols-[240px_1fr] items-center p-6 md:p-8">
+          <div className="relative">
+            <div className="absolute -inset-2 bg-gradient-to-br from-gov-saffron to-gov-green opacity-20 rounded-lg" />
+            <img
+              src={cm?.photo_url || cmPortrait}
+              alt={cm?.name ?? "Chief Minister"}
+              width={240}
+              height={300}
+              className="relative w-full max-w-[240px] mx-auto rounded-lg object-cover shadow-[var(--shadow-elegant)]"
+            />
+          </div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-accent">Message</p>
+            <h3 className="font-display text-2xl md:text-3xl font-black text-gov-navy mt-1">
+              {cm?.name ?? "Sri A. Revanth Reddy"}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {cm?.role ?? "Hon'ble Chief Minister, Government of Telangana"}
+            </p>
+            <blockquote className="mt-4 border-l-4 border-gov-saffron pl-4 italic text-foreground/80">
+              {cm?.message ?? `Together, we are building a model municipality at ${ulb.name} — efficient, accountable and citizen-centric.`}
+            </blockquote>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

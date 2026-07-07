@@ -4,18 +4,27 @@ import cmPortrait from "@/assets/cm-portrait.png";
 import telanganaLogo from "@/assets/telangana-logo.jpg";
 import risingLogo from "@/assets/rising-2047.png";
 import sridevi from "@/assets/tk-sridevi.webp.asset.json";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import type { Ulb } from "@/lib/ulb-types";
 
 const NAV = [
   { to: "/$slug", label: "Home" },
-  { to: "/$slug/about", label: "About" },
   { to: "/$slug/departments", label: "Departments" },
   { to: "/$slug/news", label: "News" },
   { to: "/$slug/tenders", label: "Tenders" },
   { to: "/$slug/gallery", label: "Gallery" },
   { to: "/$slug/contact", label: "Contact" },
+] as const;
+
+const ABOUT_ITEMS = [
+  { to: "/$slug/about", label: "ULB Profile" },
+  { to: "/$slug/organizational-chart", label: "Organizational Chart" },
+  { to: "/$slug/council", label: "Council" },
+  { to: "/$slug/co-option-members", label: "Co-option Members" },
+  { to: "/$slug/chairperson", label: "Chairperson & Vice Chairperson" },
+  { to: "/$slug/public-representatives", label: "Public Representatives" },
+  { to: "/$slug/media-coverage", label: "Media Coverage" },
 ] as const;
 
 export function UlbHeader({ ulb }: { ulb: Ulb }) {
@@ -58,9 +67,9 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
             <img
               src={sridevi.url}
               alt="Dr. T.K. Sreedevi IAS"
-              width={72}
-              height={72}
-              className="h-16 w-16 md:h-20 md:w-20 rounded-full object-cover object-top aspect-square border-2 border-gov-green shadow"
+              width={80}
+              height={80}
+              className="h-16 w-16 md:h-20 md:w-20 rounded-full object-cover object-center aspect-square border-2 border-gov-green shadow bg-gov-cream scale-110"
             />
             <figcaption className="mt-1 text-center leading-tight">
               <p className="text-[10px] font-bold text-gov-navy">Dr. T.K. Sreedevi IAS</p>
@@ -95,13 +104,46 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
       </div>
       <nav className="bg-gov-green text-primary-foreground">
         <ul className={`container mx-auto px-4 ${open ? "block" : "hidden"} lg:flex flex-wrap`}>
-          {NAV.map((item) => (
+          {NAV.slice(0, 1).map((item) => (
             <li key={item.to}>
               <Link
                 to={item.to}
                 params={{ slug }}
                 onClick={() => setOpen(false)}
                 activeOptions={{ exact: item.to === "/$slug" }}
+                className="block px-4 py-3 text-sm font-medium hover:bg-black/15 transition"
+                activeProps={{ className: "block px-4 py-3 text-sm font-bold bg-black/20" }}
+              >
+                {item.label}
+              </Link>
+            </li>
+          ))}
+          <li className="relative group">
+            <button className="w-full lg:w-auto flex items-center gap-1 px-4 py-3 text-sm font-medium hover:bg-black/15 transition">
+              About <ChevronDown className="h-3.5 w-3.5" />
+            </button>
+            <ul className="lg:absolute lg:left-0 lg:top-full lg:min-w-[240px] lg:bg-card lg:text-foreground lg:shadow-lg lg:border lg:rounded-b-md lg:hidden lg:group-hover:block bg-black/20 z-20">
+              {ABOUT_ITEMS.map((item) => (
+                <li key={item.to}>
+                  <Link
+                    to={item.to}
+                    params={{ slug }}
+                    onClick={() => setOpen(false)}
+                    className="block px-4 py-2.5 text-sm hover:bg-gov-green/10 lg:hover:text-gov-green"
+                    activeProps={{ className: "block px-4 py-2.5 text-sm font-bold bg-gov-green/10 text-gov-green" }}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </li>
+          {NAV.slice(1).map((item) => (
+            <li key={item.to}>
+              <Link
+                to={item.to}
+                params={{ slug }}
+                onClick={() => setOpen(false)}
                 className="block px-4 py-3 text-sm font-medium hover:bg-black/15 transition"
                 activeProps={{ className: "block px-4 py-3 text-sm font-bold bg-black/20" }}
               >
