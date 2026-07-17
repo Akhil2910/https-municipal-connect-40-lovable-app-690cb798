@@ -58,7 +58,7 @@ function AdminDashboard() {
     { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "summary", label: "Summary", type: "textarea" },
     { name: "body", label: "Body", type: "textarea" },
-    { name: "image_url", label: "Image URL", type: "text" },
+    { name: "image_url", label: "Image", type: "image" },
     { name: "is_published", label: "Published", type: "boolean", default: true },
   ];
   const noticesFields: FieldDef[] = [
@@ -69,10 +69,10 @@ function AdminDashboard() {
     { name: "file_url", label: "File URL", type: "text" },
   ];
   const bannersFields: FieldDef[] = [
-    { name: "title", label: "Title", type: "text" },
+    { name: "title", label: "Title (hero heading)", type: "text" },
     { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "subtitle", label: "Subtitle", type: "text" },
-    { name: "image_url", label: "Image URL", type: "text", required: true },
+    { name: "image_url", label: "Hero image", type: "image", required: true },
     { name: "link_url", label: "Link URL", type: "text" },
     { name: "sort_order", label: "Sort", type: "number", default: 0 },
     { name: "is_active", label: "Active", type: "boolean", default: true },
@@ -92,7 +92,7 @@ function AdminDashboard() {
     { name: "name", label: "Name", type: "text", required: true },
     { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "role", label: "Role", type: "text", required: true },
-    { name: "photo_url", label: "Photo URL", type: "text" },
+    { name: "photo_url", label: "Photo", type: "image" },
     { name: "message", label: "Message", type: "textarea" },
     { name: "sort_order", label: "Sort", type: "number", default: 0 },
   ];
@@ -105,7 +105,7 @@ function AdminDashboard() {
     { name: "email", label: "Email", type: "text" },
   ];
   const galleryFields: FieldDef[] = [
-    { name: "image_url", label: "Image URL", type: "text", required: true },
+    { name: "image_url", label: "Image", type: "image", required: true },
     { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "caption", label: "Caption", type: "text" },
     { name: "category", label: "Category", type: "text" },
@@ -118,6 +118,31 @@ function AdminDashboard() {
     { name: "content", label: "Content", type: "textarea" },
     { name: "external_url", label: "External URL", type: "text" },
     { name: "sort_order", label: "Sort", type: "number", default: 0 },
+  ];
+  const councilFields: FieldDef[] = [
+    { name: "name", label: "Name", type: "text", required: true },
+    { name: "ward", label: "Ward", type: "text" },
+    { name: "designation", label: "Designation", type: "text" },
+    { name: "phone", label: "Phone", type: "text" },
+    { name: "email", label: "Email", type: "text" },
+    { name: "photo_url", label: "Photo", type: "image" },
+    { name: "sort_order", label: "Sort", type: "number", default: 0 },
+  ];
+  const coOptionFields: FieldDef[] = councilFields;
+  const publicRepsFields: FieldDef[] = [
+    { name: "name", label: "Name", type: "text", required: true },
+    { name: "designation", label: "Designation (MP / MLA / MLC)", type: "text" },
+    { name: "constituency", label: "Constituency", type: "text" },
+    { name: "phone", label: "Phone", type: "text" },
+    { name: "email", label: "Email", type: "text" },
+    { name: "photo_url", label: "Photo", type: "image" },
+    { name: "sort_order", label: "Sort", type: "number", default: 0 },
+  ];
+  const pagesFields: FieldDef[] = [
+    { name: "slug", label: "Slug (about, organizational-chart, media-coverage, etc.)", type: "text", required: true },
+    { name: "title", label: "Title", type: "text" },
+    { name: "body", label: "Body / Description", type: "textarea" },
+    { name: "image_url", label: "Image", type: "image" },
   ];
 
   return (
@@ -159,6 +184,10 @@ function AdminDashboard() {
             <TabsTrigger value="departments">Departments</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
             <TabsTrigger value="services">Services</TabsTrigger>
+            <TabsTrigger value="council_members">Council Members</TabsTrigger>
+            <TabsTrigger value="co_option_members">Co-option Members</TabsTrigger>
+            <TabsTrigger value="public_representatives">Public Reps</TabsTrigger>
+            <TabsTrigger value="pages">About Pages</TabsTrigger>
             <TabsTrigger value="grievances">Grievances</TabsTrigger>
           </TabsList>
 
@@ -171,6 +200,10 @@ function AdminDashboard() {
           <TabsContent value="departments"><CrudSection table="departments" ulbId={ulbId} fields={deptFields} title="Departments" /></TabsContent>
           <TabsContent value="gallery"><CrudSection table="gallery" ulbId={ulbId} fields={galleryFields} title="Gallery" /></TabsContent>
           <TabsContent value="services"><CrudSection table="services_info" ulbId={ulbId} fields={servicesFields} title="Services" /></TabsContent>
+          <TabsContent value="council_members"><CrudSection table="council_members" ulbId={ulbId} fields={councilFields} title="Council Members" /></TabsContent>
+          <TabsContent value="co_option_members"><CrudSection table="co_option_members" ulbId={ulbId} fields={coOptionFields} title="Co-option Members" /></TabsContent>
+          <TabsContent value="public_representatives"><CrudSection table="public_representatives" ulbId={ulbId} fields={publicRepsFields} title="Public Representatives" /></TabsContent>
+          <TabsContent value="pages"><CrudSection table="pages" ulbId={ulbId} fields={pagesFields} title="About / Content Pages" /></TabsContent>
           <TabsContent value="grievances"><GrievancesSection ulbId={ulbId} /></TabsContent>
         </Tabs>
       </main>
