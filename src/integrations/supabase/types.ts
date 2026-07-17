@@ -61,6 +61,106 @@ export type Database = {
           },
         ]
       }
+      co_option_members: {
+        Row: {
+          created_at: string
+          designation: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          photo_url: string | null
+          sort_order: number
+          ulb_id: string
+          updated_at: string
+          ward: string | null
+        }
+        Insert: {
+          created_at?: string
+          designation?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          sort_order?: number
+          ulb_id: string
+          updated_at?: string
+          ward?: string | null
+        }
+        Update: {
+          created_at?: string
+          designation?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          sort_order?: number
+          ulb_id?: string
+          updated_at?: string
+          ward?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "co_option_members_ulb_id_fkey"
+            columns: ["ulb_id"]
+            isOneToOne: false
+            referencedRelation: "ulbs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      council_members: {
+        Row: {
+          created_at: string
+          designation: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          photo_url: string | null
+          sort_order: number
+          ulb_id: string
+          updated_at: string
+          ward: string | null
+        }
+        Insert: {
+          created_at?: string
+          designation?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          sort_order?: number
+          ulb_id: string
+          updated_at?: string
+          ward?: string | null
+        }
+        Update: {
+          created_at?: string
+          designation?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          sort_order?: number
+          ulb_id?: string
+          updated_at?: string
+          ward?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "council_members_ulb_id_fkey"
+            columns: ["ulb_id"]
+            isOneToOne: false
+            referencedRelation: "ulbs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       departments: {
         Row: {
           created_at: string
@@ -324,6 +424,97 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "notices_ulb_id_fkey"
+            columns: ["ulb_id"]
+            isOneToOne: false
+            referencedRelation: "ulbs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pages: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          slug: string
+          title: string | null
+          ulb_id: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          slug: string
+          title?: string | null
+          ulb_id: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          slug?: string
+          title?: string | null
+          ulb_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pages_ulb_id_fkey"
+            columns: ["ulb_id"]
+            isOneToOne: false
+            referencedRelation: "ulbs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_representatives: {
+        Row: {
+          constituency: string | null
+          created_at: string
+          designation: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          photo_url: string | null
+          sort_order: number
+          ulb_id: string
+          updated_at: string
+        }
+        Insert: {
+          constituency?: string | null
+          created_at?: string
+          designation?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          sort_order?: number
+          ulb_id: string
+          updated_at?: string
+        }
+        Update: {
+          constituency?: string | null
+          created_at?: string
+          designation?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          sort_order?: number
+          ulb_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_representatives_ulb_id_fkey"
             columns: ["ulb_id"]
             isOneToOne: false
             referencedRelation: "ulbs"

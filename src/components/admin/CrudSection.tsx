@@ -12,7 +12,7 @@ import { Pencil, Trash2, Plus, X } from "lucide-react";
 export type FieldDef = {
   name: string;
   label: string;
-  type: "text" | "textarea" | "number" | "boolean" | "date";
+  type: "text" | "textarea" | "number" | "boolean" | "date" | "image";
   required?: boolean;
   default?: string | number | boolean;
 };
@@ -99,6 +99,28 @@ export function CrudSection({ table, ulbId, fields, title }: Props) {
                 <Textarea rows={4} value={editing[f.name] ?? ""} onChange={(e) => setEditing({ ...editing, [f.name]: e.target.value })} />
               ) : f.type === "boolean" ? (
                 <Switch checked={!!editing[f.name]} onCheckedChange={(v) => setEditing({ ...editing, [f.name]: v })} />
+              ) : f.type === "image" ? (
+                <div className="grid gap-2">
+                  {editing[f.name] && (
+                    <img src={editing[f.name]} alt="" className="max-h-40 w-auto rounded border" />
+                  )}
+                  <div className="flex gap-2 items-center">
+                    <Input type="file" accept="image/*" onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const path = `${table}/${ulbId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+                      const up = await supabase.storage.from('public-assets').upload(path, file, { upsert: true });
+                      if (up.error) { toast.error(up.error.message); return; }
+                      const { data: signed, error: sErr } = await supabase.storage.from('public-assets')
+                        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+                      if (sErr || !signed) { toast.error(sErr?.message ?? 'Failed to sign URL'); return; }
+                      setEditing({ ...editing, [f.name]: signed.signedUrl });
+                      toast.success('Image uploaded');
+                    }} />
+                    <Input placeholder="or paste URL" value={editing[f.name] ?? ""}
+                      onChange={(e) => setEditing({ ...editing, [f.name]: e.target.value })} />
+                  </div>
+                </div>
               ) : (
                 <Input
                   type={f.type === "number" ? "number" : f.type === "date" ? "date" : "text"}
