@@ -7,6 +7,7 @@ import { WeatherPanel } from "@/components/site/WeatherPanel";
 import hero from "@/assets/hero-default.jpg";
 import { ArrowRight, Users, MapPin, Calendar, Landmark, Target, Eye, Map as MapIcon } from "lucide-react";
 import type { News, Notice, Banner, Leadership } from "@/lib/ulb-types";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/$slug/")({
   loader: async ({ params }) => {
@@ -39,7 +40,13 @@ function UlbHome() {
     subtitle: "Building a transparent, citizen-first urban future.",
     link_url: null,
   } as unknown as Banner];
-  const top = slides[0];
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 5000);
+    return () => clearInterval(t);
+  }, [slides.length]);
+  const top = slides[idx] ?? slides[0];
   const cm = leadership.find((l) => l.role.toLowerCase().includes("chief minister")) ?? null;
   const others = leadership.filter((l) => l !== cm).slice(0, 3);
   void cm;
@@ -49,9 +56,11 @@ function UlbHome() {
       <Ticker notices={notices} />
 
       {/* Hero / Rising Banner */}
-      <section className="relative overflow-hidden">
-        <img src={top.image_url} alt={top.title ?? ""} width={1920} height={900}
-             className="absolute inset-0 h-full w-full object-cover" />
+      <section className="relative overflow-hidden min-h-[480px] md:min-h-[560px]">
+        {slides.map((s, i) => (
+          <img key={s.id} src={s.image_url} alt={s.title ?? ""} width={1920} height={900}
+               className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === idx ? 'opacity-100' : 'opacity-0'}`} />
+        ))}
         <div className="absolute inset-0" style={{ background: "var(--gradient-hero)", opacity: 0.78 }} />
         <div className="relative container mx-auto px-4 py-20 md:py-28 text-primary-foreground animate-fade-up">
           <p className="text-sm uppercase tracking-[0.3em] opacity-90">Government of Telangana</p>
@@ -71,6 +80,14 @@ function UlbHome() {
               Lodge a Grievance
             </Link>
           </div>
+          {slides.length > 1 && (
+            <div className="mt-6 flex gap-2">
+              {slides.map((s, i) => (
+                <button key={s.id} aria-label={`Slide ${i + 1}`} onClick={() => setIdx(i)}
+                  className={`h-2 rounded-full transition-all ${i === idx ? 'bg-white w-8' : 'bg-white/50 w-2'}`} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
