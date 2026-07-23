@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as SlugTendersRouteImport } from './routes/$slug.tenders'
 import { Route as SlugPublicRepresentativesRouteImport } from './routes/$slug.public-representatives'
 import { Route as SlugOrganizationalChartRouteImport } from './routes/$slug.organizational-chart'
 import { Route as SlugNoticesRouteImport } from './routes/$slug.notices'
@@ -57,6 +58,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SlugTendersRoute = SlugTendersRouteImport.update({
+  id: '/tenders',
+  path: '/tenders',
+  getParentRoute: () => SlugRoute,
 } as any)
 const SlugPublicRepresentativesRoute =
   SlugPublicRepresentativesRouteImport.update({
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/$slug/notices': typeof SlugNoticesRoute
   '/$slug/organizational-chart': typeof SlugOrganizationalChartRoute
   '/$slug/public-representatives': typeof SlugPublicRepresentativesRoute
+  '/$slug/tenders': typeof SlugTendersRoute
   '/admin/login': typeof AdminLoginRoute
   '/$slug/': typeof SlugIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/$slug/notices': typeof SlugNoticesRoute
   '/$slug/organizational-chart': typeof SlugOrganizationalChartRoute
   '/$slug/public-representatives': typeof SlugPublicRepresentativesRoute
+  '/$slug/tenders': typeof SlugTendersRoute
   '/admin/login': typeof AdminLoginRoute
   '/$slug': typeof SlugIndexRoute
   '/admin': typeof AdminIndexRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/$slug/notices': typeof SlugNoticesRoute
   '/$slug/organizational-chart': typeof SlugOrganizationalChartRoute
   '/$slug/public-representatives': typeof SlugPublicRepresentativesRoute
+  '/$slug/tenders': typeof SlugTendersRoute
   '/admin/login': typeof AdminLoginRoute
   '/$slug/': typeof SlugIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/$slug/notices'
     | '/$slug/organizational-chart'
     | '/$slug/public-representatives'
+    | '/$slug/tenders'
     | '/admin/login'
     | '/$slug/'
     | '/admin/'
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/$slug/notices'
     | '/$slug/organizational-chart'
     | '/$slug/public-representatives'
+    | '/$slug/tenders'
     | '/admin/login'
     | '/$slug'
     | '/admin'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/$slug/notices'
     | '/$slug/organizational-chart'
     | '/$slug/public-representatives'
+    | '/$slug/tenders'
     | '/admin/login'
     | '/$slug/'
     | '/admin/'
@@ -293,6 +305,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$slug/tenders': {
+      id: '/$slug/tenders'
+      path: '/tenders'
+      fullPath: '/$slug/tenders'
+      preLoaderRoute: typeof SlugTendersRouteImport
+      parentRoute: typeof SlugRoute
     }
     '/$slug/public-representatives': {
       id: '/$slug/public-representatives'
@@ -394,6 +413,7 @@ interface SlugRouteChildren {
   SlugNoticesRoute: typeof SlugNoticesRoute
   SlugOrganizationalChartRoute: typeof SlugOrganizationalChartRoute
   SlugPublicRepresentativesRoute: typeof SlugPublicRepresentativesRoute
+  SlugTendersRoute: typeof SlugTendersRoute
   SlugIndexRoute: typeof SlugIndexRoute
 }
 
@@ -410,6 +430,7 @@ const SlugRouteChildren: SlugRouteChildren = {
   SlugNoticesRoute: SlugNoticesRoute,
   SlugOrganizationalChartRoute: SlugOrganizationalChartRoute,
   SlugPublicRepresentativesRoute: SlugPublicRepresentativesRoute,
+  SlugTendersRoute: SlugTendersRoute,
   SlugIndexRoute: SlugIndexRoute,
 }
 
