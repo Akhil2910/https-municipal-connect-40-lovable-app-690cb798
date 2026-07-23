@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, X } from "lucide-react";
 
-const FIELDS: { name: string; label: string; type: "text" | "textarea" | "number" | "boolean" }[] = [
+const FIELDS: { name: string; label: string; type: "text" | "textarea" | "number" | "boolean" | "image" }[] = [
   { name: "name", label: "Name", type: "text" },
   { name: "slug", label: "Slug (URL)", type: "text" },
   { name: "type", label: "Type", type: "text" },
@@ -26,8 +26,8 @@ const FIELDS: { name: string; label: string; type: "text" | "textarea" | "number
   { name: "mission", label: "Mission", type: "textarea" },
   { name: "vision", label: "Vision", type: "textarea" },
   { name: "about", label: "About", type: "textarea" },
-  { name: "hero_image_url", label: "Hero Image URL", type: "text" },
-  { name: "logo_url", label: "Logo URL", type: "text" },
+  { name: "hero_image_url", label: "Hero Image", type: "image" },
+  { name: "logo_url", label: "Logo", type: "image" },
   { name: "primary_color", label: "Primary Color", type: "text" },
   { name: "is_active", label: "Active", type: "boolean" },
 ];
@@ -86,6 +86,26 @@ export function UlbsSection() {
                   <Textarea rows={3} value={editing[f.name] ?? ""} onChange={(e) => setEditing({ ...editing, [f.name]: e.target.value })} />
                 ) : f.type === "boolean" ? (
                   <Switch checked={!!editing[f.name]} onCheckedChange={(v) => setEditing({ ...editing, [f.name]: v })} />
+                ) : f.type === "image" ? (
+                  <div className="grid gap-2">
+                    {editing[f.name] && (
+                      <img src={editing[f.name]} alt="" className="max-h-32 w-auto rounded border" />
+                    )}
+                    <Input type="file" accept="image/*" onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const path = `ulbs/${editing.slug || 'new'}/${f.name}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+                      const up = await supabase.storage.from('public-assets').upload(path, file, { upsert: true });
+                      if (up.error) { toast.error(up.error.message); return; }
+                      const { data: signed, error: sErr } = await supabase.storage.from('public-assets')
+                        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+                      if (sErr || !signed) { toast.error(sErr?.message ?? 'Failed to sign URL'); return; }
+                      setEditing({ ...editing, [f.name]: signed.signedUrl });
+                      toast.success('Uploaded');
+                    }} />
+                    <Input placeholder="or paste URL" value={editing[f.name] ?? ""}
+                      onChange={(e) => setEditing({ ...editing, [f.name]: e.target.value })} />
+                  </div>
                 ) : (
                   <Input type={f.type === "number" ? "number" : "text"} value={editing[f.name] ?? ""} onChange={(e) => setEditing({ ...editing, [f.name]: e.target.value })} />
                 )}

@@ -21,6 +21,7 @@ import { Route as SlugNoticesRouteImport } from './routes/$slug.notices'
 import { Route as SlugNewsRouteImport } from './routes/$slug.news'
 import { Route as SlugMediaCoverageRouteImport } from './routes/$slug.media-coverage'
 import { Route as SlugGrievanceRouteImport } from './routes/$slug.grievance'
+import { Route as SlugGalleryRouteImport } from './routes/$slug.gallery'
 import { Route as SlugDepartmentsRouteImport } from './routes/$slug.departments'
 import { Route as SlugCouncilRouteImport } from './routes/$slug.council'
 import { Route as SlugCoOptionMembersRouteImport } from './routes/$slug.co-option-members'
@@ -88,6 +89,11 @@ const SlugGrievanceRoute = SlugGrievanceRouteImport.update({
   path: '/grievance',
   getParentRoute: () => SlugRoute,
 } as any)
+const SlugGalleryRoute = SlugGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => SlugRoute,
+} as any)
 const SlugDepartmentsRoute = SlugDepartmentsRouteImport.update({
   id: '/departments',
   path: '/departments',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
   '/$slug/council': typeof SlugCouncilRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/gallery': typeof SlugGalleryRoute
   '/$slug/grievance': typeof SlugGrievanceRoute
   '/$slug/media-coverage': typeof SlugMediaCoverageRoute
   '/$slug/news': typeof SlugNewsRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
   '/$slug/council': typeof SlugCouncilRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/gallery': typeof SlugGalleryRoute
   '/$slug/grievance': typeof SlugGrievanceRoute
   '/$slug/media-coverage': typeof SlugMediaCoverageRoute
   '/$slug/news': typeof SlugNewsRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
   '/$slug/council': typeof SlugCouncilRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
+  '/$slug/gallery': typeof SlugGalleryRoute
   '/$slug/grievance': typeof SlugGrievanceRoute
   '/$slug/media-coverage': typeof SlugMediaCoverageRoute
   '/$slug/news': typeof SlugNewsRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/$slug/co-option-members'
     | '/$slug/council'
     | '/$slug/departments'
+    | '/$slug/gallery'
     | '/$slug/grievance'
     | '/$slug/media-coverage'
     | '/$slug/news'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/$slug/co-option-members'
     | '/$slug/council'
     | '/$slug/departments'
+    | '/$slug/gallery'
     | '/$slug/grievance'
     | '/$slug/media-coverage'
     | '/$slug/news'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/$slug/co-option-members'
     | '/$slug/council'
     | '/$slug/departments'
+    | '/$slug/gallery'
     | '/$slug/grievance'
     | '/$slug/media-coverage'
     | '/$slug/news'
@@ -324,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugGrievanceRouteImport
       parentRoute: typeof SlugRoute
     }
+    '/$slug/gallery': {
+      id: '/$slug/gallery'
+      path: '/gallery'
+      fullPath: '/$slug/gallery'
+      preLoaderRoute: typeof SlugGalleryRouteImport
+      parentRoute: typeof SlugRoute
+    }
     '/$slug/departments': {
       id: '/$slug/departments'
       path: '/departments'
@@ -368,6 +387,7 @@ interface SlugRouteChildren {
   SlugCoOptionMembersRoute: typeof SlugCoOptionMembersRoute
   SlugCouncilRoute: typeof SlugCouncilRoute
   SlugDepartmentsRoute: typeof SlugDepartmentsRoute
+  SlugGalleryRoute: typeof SlugGalleryRoute
   SlugGrievanceRoute: typeof SlugGrievanceRoute
   SlugMediaCoverageRoute: typeof SlugMediaCoverageRoute
   SlugNewsRoute: typeof SlugNewsRoute
@@ -383,6 +403,7 @@ const SlugRouteChildren: SlugRouteChildren = {
   SlugCoOptionMembersRoute: SlugCoOptionMembersRoute,
   SlugCouncilRoute: SlugCouncilRoute,
   SlugDepartmentsRoute: SlugDepartmentsRoute,
+  SlugGalleryRoute: SlugGalleryRoute,
   SlugGrievanceRoute: SlugGrievanceRoute,
   SlugMediaCoverageRoute: SlugMediaCoverageRoute,
   SlugNewsRoute: SlugNewsRoute,
