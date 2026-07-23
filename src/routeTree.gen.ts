@@ -25,6 +25,7 @@ import { Route as SlugGrievanceRouteImport } from './routes/$slug.grievance'
 import { Route as SlugGalleryRouteImport } from './routes/$slug.gallery'
 import { Route as SlugDepartmentsRouteImport } from './routes/$slug.departments'
 import { Route as SlugCouncilRouteImport } from './routes/$slug.council'
+import { Route as SlugContactRouteImport } from './routes/$slug.contact'
 import { Route as SlugCoOptionMembersRouteImport } from './routes/$slug.co-option-members'
 import { Route as SlugChairpersonRouteImport } from './routes/$slug.chairperson'
 import { Route as SlugAboutRouteImport } from './routes/$slug.about'
@@ -110,6 +111,11 @@ const SlugCouncilRoute = SlugCouncilRouteImport.update({
   path: '/council',
   getParentRoute: () => SlugRoute,
 } as any)
+const SlugContactRoute = SlugContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => SlugRoute,
+} as any)
 const SlugCoOptionMembersRoute = SlugCoOptionMembersRouteImport.update({
   id: '/co-option-members',
   path: '/co-option-members',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/chairperson': typeof SlugChairpersonRoute
   '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
+  '/$slug/contact': typeof SlugContactRoute
   '/$slug/council': typeof SlugCouncilRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug/gallery': typeof SlugGalleryRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/chairperson': typeof SlugChairpersonRoute
   '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
+  '/$slug/contact': typeof SlugContactRoute
   '/$slug/council': typeof SlugCouncilRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug/gallery': typeof SlugGalleryRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/chairperson': typeof SlugChairpersonRoute
   '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
+  '/$slug/contact': typeof SlugContactRoute
   '/$slug/council': typeof SlugCouncilRoute
   '/$slug/departments': typeof SlugDepartmentsRoute
   '/$slug/gallery': typeof SlugGalleryRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/$slug/about'
     | '/$slug/chairperson'
     | '/$slug/co-option-members'
+    | '/$slug/contact'
     | '/$slug/council'
     | '/$slug/departments'
     | '/$slug/gallery'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/$slug/about'
     | '/$slug/chairperson'
     | '/$slug/co-option-members'
+    | '/$slug/contact'
     | '/$slug/council'
     | '/$slug/departments'
     | '/$slug/gallery'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/$slug/about'
     | '/$slug/chairperson'
     | '/$slug/co-option-members'
+    | '/$slug/contact'
     | '/$slug/council'
     | '/$slug/departments'
     | '/$slug/gallery'
@@ -376,6 +388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugCouncilRouteImport
       parentRoute: typeof SlugRoute
     }
+    '/$slug/contact': {
+      id: '/$slug/contact'
+      path: '/contact'
+      fullPath: '/$slug/contact'
+      preLoaderRoute: typeof SlugContactRouteImport
+      parentRoute: typeof SlugRoute
+    }
     '/$slug/co-option-members': {
       id: '/$slug/co-option-members'
       path: '/co-option-members'
@@ -404,6 +423,7 @@ interface SlugRouteChildren {
   SlugAboutRoute: typeof SlugAboutRoute
   SlugChairpersonRoute: typeof SlugChairpersonRoute
   SlugCoOptionMembersRoute: typeof SlugCoOptionMembersRoute
+  SlugContactRoute: typeof SlugContactRoute
   SlugCouncilRoute: typeof SlugCouncilRoute
   SlugDepartmentsRoute: typeof SlugDepartmentsRoute
   SlugGalleryRoute: typeof SlugGalleryRoute
@@ -421,6 +441,7 @@ const SlugRouteChildren: SlugRouteChildren = {
   SlugAboutRoute: SlugAboutRoute,
   SlugChairpersonRoute: SlugChairpersonRoute,
   SlugCoOptionMembersRoute: SlugCoOptionMembersRoute,
+  SlugContactRoute: SlugContactRoute,
   SlugCouncilRoute: SlugCouncilRoute,
   SlugDepartmentsRoute: SlugDepartmentsRoute,
   SlugGalleryRoute: SlugGalleryRoute,
