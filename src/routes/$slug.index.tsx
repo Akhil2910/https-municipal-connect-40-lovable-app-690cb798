@@ -59,10 +59,12 @@ function UlbHome() {
       <section className="relative overflow-hidden min-h-[480px] md:min-h-[560px]">
         {slides.map((s, i) => (
           <img key={s.id} src={s.image_url} alt={s.title ?? ""} width={1920} height={900}
-               className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === idx ? 'opacity-100' : 'opacity-0'}`} />
+               className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-1000 ${i === idx ? 'opacity-100' : 'opacity-0'}`} />
         ))}
-        <div className="absolute inset-0" style={{ background: "var(--gradient-hero)", opacity: 0.78 }} />
-        <div className="relative container mx-auto px-4 py-20 md:py-28 text-primary-foreground animate-fade-up">
+        {/* Light gradient overlay — image stays clearly visible, text stays readable */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/50 to-transparent" />
+        <div className="relative container mx-auto px-4 py-20 md:py-28 text-primary-foreground animate-fade-up [text-shadow:0_2px_12px_rgba(0,0,0,0.55)]">
           <p className="text-sm uppercase tracking-[0.3em] opacity-90">Government of Telangana</p>
           <h2 className="font-display text-4xl md:text-6xl font-black mt-3 max-w-3xl">
             {top.title ?? `Welcome to ${ulb.name}`}
