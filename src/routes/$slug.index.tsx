@@ -59,7 +59,8 @@ function UlbHome() {
       <section className="relative overflow-hidden min-h-[480px] md:min-h-[560px]">
         {slides.map((s, i) => (
           <img key={s.id} src={s.image_url} alt={s.title ?? ""} width={1920} height={900}
-               className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-1000 ${i === idx ? 'opacity-100' : 'opacity-0'}`} />
+               style={{ objectPosition: "center 25%" }}
+               className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${i === idx ? 'opacity-100' : 'opacity-0'}`} />
         ))}
         {/* Light gradient overlay — image stays clearly visible, text stays readable */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
