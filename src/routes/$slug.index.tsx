@@ -194,7 +194,7 @@ function UlbHome() {
             <div className="grid gap-4 md:grid-cols-2">
               {news.map((n) => (
                 <article key={n.id} className="bg-card border rounded-lg overflow-hidden hover:shadow-[var(--shadow-elegant)] transition">
-                  {n.image_url && <img src={n.image_url} alt="" className="w-full h-40 object-cover" loading="lazy" />}
+                  {n.image_url && <img src={n.image_url} alt={n.title} className="w-full h-40 object-contain bg-muted" loading="lazy" />}
                   <div className="p-4">
                     <p className="text-xs text-muted-foreground">{new Date(n.published_at).toLocaleDateString()}</p>
                     <h4 className="font-bold mt-1">{n.title}</h4>

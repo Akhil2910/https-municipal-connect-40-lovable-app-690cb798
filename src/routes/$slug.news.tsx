@@ -17,7 +17,7 @@ export const Route = createFileRoute("/$slug/news")({
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-8">
           {items.map((n) => (
             <article key={n.id} className="bg-card border rounded-lg overflow-hidden">
-              {n.image_url && <img src={n.image_url} alt="" className="w-full h-48 object-cover" loading="lazy" />}
+              {n.image_url && <img src={n.image_url} alt={n.title} className="w-full h-48 object-contain bg-muted" loading="lazy" />}
               <div className="p-5">
                 <p className="text-xs text-muted-foreground">{new Date(n.published_at).toLocaleDateString()}</p>
                 <h3 className="font-bold mt-1">{n.title}</h3>
