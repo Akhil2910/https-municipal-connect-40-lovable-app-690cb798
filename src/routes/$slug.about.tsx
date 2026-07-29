@@ -18,6 +18,7 @@ function About() {
   const ulb = useUlb();
   const { leadership } = Route.useLoaderData() as { leadership: Leadership[] };
   const cm = leadership.find((l: Leadership) => l.role.toLowerCase().includes("chief minister")) ?? null;
+  const commissioner = leadership.find((l: Leadership) => l.role.toLowerCase().includes("commissioner")) ?? null;
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <h1 className="font-display text-4xl font-black text-gov-navy">About {ulb.name}</h1>
@@ -79,6 +80,36 @@ function About() {
           </div>
         </div>
       </section>
+
+      {/* Commissioner's Message */}
+      {commissioner && (
+        <section className="mt-8 bg-card border rounded-xl overflow-hidden">
+          <div className="grid gap-6 md:grid-cols-[240px_1fr] items-center p-6 md:p-8">
+            <div className="relative">
+              <div className="absolute -inset-2 bg-gradient-to-br from-gov-green to-gov-navy opacity-20 rounded-lg" />
+              <img
+                src={commissioner.photo_url || cmPortrait}
+                alt={commissioner.name}
+                width={240}
+                height={300}
+                className="relative w-full max-w-[240px] mx-auto rounded-lg object-cover shadow-[var(--shadow-elegant)]"
+              />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-accent">Message</p>
+              <h3 className="font-display text-2xl md:text-3xl font-black text-gov-navy mt-1">
+                {commissioner.name}
+              </h3>
+              <p className="text-sm text-muted-foreground">{commissioner.role}</p>
+              {commissioner.message && (
+                <blockquote className="mt-4 border-l-4 border-gov-green pl-4 italic text-foreground/80">
+                  {commissioner.message}
+                </blockquote>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
