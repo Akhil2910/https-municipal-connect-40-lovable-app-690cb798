@@ -21,6 +21,6 @@ Goal: one public website serving only Mulugu, at its own domain, from this same 
 
 A `*.telangana.gov.in` subdomain can only be issued by NIC — it cannot be registered from here. Until NIC issues one, the site runs on the `.lovable.app` URL or any domain you own; the switch later is just a DNS change, no rebuild.
 
-## What I need from you
+## Decision taken
 
-- The exact domain/subdomain to use for Mulugu (or confirmation to go live on `.lovable.app` first and attach a domain later).
+Publish now on the `.lovable.app` URL. Step 3 (domain) stays optional and can be done any time from Project Settings > Domains — attaching a domain later needs no rebuild, and publishing can be undone with Unpublish.
