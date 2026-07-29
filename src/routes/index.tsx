@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { getHostSlug } from "@/lib/host.functions";
 import { TopGovBar } from "@/components/site/TopGovBar";
 import { Footer } from "@/components/site/Footer";
 import emblem from "@/assets/ulb-emblem.png";
@@ -17,6 +18,8 @@ export const Route = createFileRoute("/")({
     ],
   }),
   loader: async () => {
+    const { slug } = await getHostSlug();
+    if (slug) throw redirect({ to: "/$slug", params: { slug } });
     const { data, error } = await supabase
       .from("ulbs")
       .select("*")
