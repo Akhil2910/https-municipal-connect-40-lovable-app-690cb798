@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { CrudSection, type FieldDef } from "@/components/admin/CrudSection";
 import { GrievancesSection } from "@/components/admin/GrievancesSection";
 import { UlbsSection } from "@/components/admin/UlbsSection";
+import { DomainsSection } from "@/components/admin/DomainsSection";
+import { AdminUsersSection } from "@/components/admin/AdminUsersSection";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
@@ -19,6 +21,7 @@ function AdminDashboard() {
   const [ulbs, setUlbs] = useState<{ id: string; name: string; slug: string }[]>([]);
   const [ulbId, setUlbId] = useState<string>("");
   const [email, setEmail] = useState<string>("");
+  const [isSuper, setIsSuper] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -30,16 +33,33 @@ function AdminDashboard() {
       setEmail(session.user.email ?? "");
       const { data: roles } = await supabase
         .from("user_roles").select("role").eq("user_id", session.user.id);
-      if (!roles?.some((r) => r.role === "super_admin")) {
-        toast.error("You don't have super_admin access");
+      const superAdmin = !!roles?.some((r) => r.role === "super_admin");
+      setIsSuper(superAdmin);
+
+      let scopedIds: string[] | null = null;
+      if (!superAdmin) {
+        const { data: scope } = await supabase
+          .from("ulb_admins").select("ulb_id").eq("user_id", session.user.id);
+        scopedIds = (scope ?? []).map((s) => s.ulb_id);
+        if (scopedIds.length === 0) {
+          toast.error("You don't have admin access to any municipality");
+          await supabase.auth.signOut();
+          nav({ to: "/admin/login" });
+          return;
+        }
+      }
+
+      let query = supabase.from("ulbs").select("id,name,slug").order("name");
+      if (scopedIds) query = query.in("id", scopedIds);
+      const { data: ulbList } = await query;
+      if (!ulbList || ulbList.length === 0) {
+        toast.error("No municipalities available for this account");
         await supabase.auth.signOut();
         nav({ to: "/admin/login" });
         return;
       }
-      const { data: ulbList } = await supabase
-        .from("ulbs").select("id,name,slug").order("name");
-      setUlbs(ulbList ?? []);
-      if (ulbList && ulbList.length > 0) setUlbId(ulbList[0].id);
+      setUlbs(ulbList);
+      setUlbId(ulbList[0].id);
       setReady(true);
     })();
   }, [nav]);
@@ -173,9 +193,9 @@ function AdminDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="ulbs">
+        <Tabs defaultValue={isSuper ? "ulbs" : "news"}>
           <TabsList className="flex flex-wrap h-auto">
-            <TabsTrigger value="ulbs">ULBs</TabsTrigger>
+            {isSuper && <TabsTrigger value="ulbs">ULBs</TabsTrigger>}
             <TabsTrigger value="news">News</TabsTrigger>
             <TabsTrigger value="notices">Notices</TabsTrigger>
             <TabsTrigger value="banners">Banners</TabsTrigger>
@@ -189,9 +209,11 @@ function AdminDashboard() {
             <TabsTrigger value="public_representatives">Public Reps</TabsTrigger>
             <TabsTrigger value="pages">About Pages</TabsTrigger>
             <TabsTrigger value="grievances">Grievances</TabsTrigger>
+            {isSuper && <TabsTrigger value="domains">Domains</TabsTrigger>}
+            {isSuper && <TabsTrigger value="admins">Admins</TabsTrigger>}
           </TabsList>
 
-          <TabsContent value="ulbs"><UlbsSection /></TabsContent>
+          {isSuper && <TabsContent value="ulbs"><UlbsSection /></TabsContent>}
           <TabsContent value="news"><CrudSection table="news" ulbId={ulbId} fields={newsFields} title="News" /></TabsContent>
           <TabsContent value="notices"><CrudSection table="notices" ulbId={ulbId} fields={noticesFields} title="Notices" /></TabsContent>
           <TabsContent value="banners"><CrudSection table="banners" ulbId={ulbId} fields={bannersFields} title="Banners" /></TabsContent>
@@ -205,6 +227,8 @@ function AdminDashboard() {
           <TabsContent value="public_representatives"><CrudSection table="public_representatives" ulbId={ulbId} fields={publicRepsFields} title="Public Representatives" /></TabsContent>
           <TabsContent value="pages"><CrudSection table="pages" ulbId={ulbId} fields={pagesFields} title="About / Content Pages" /></TabsContent>
           <TabsContent value="grievances"><GrievancesSection ulbId={ulbId} /></TabsContent>
+          {isSuper && <TabsContent value="domains"><DomainsSection ulbs={ulbs} /></TabsContent>}
+          {isSuper && <TabsContent value="admins"><AdminUsersSection ulbs={ulbs} /></TabsContent>}
         </Tabs>
       </main>
     </div>

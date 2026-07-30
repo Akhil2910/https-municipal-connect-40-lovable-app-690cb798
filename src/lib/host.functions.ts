@@ -48,6 +48,21 @@ export const getHostSlug = createServerFn({ method: "GET" }).handler(async () =>
   } catch {
     host = null;
   }
+  const clean = host ? host.toLowerCase().split(":")[0] : null;
+
+  // 1. Exact hostname mapping configured by the super admin (domains table).
+  if (clean) {
+    const bare = clean.replace(/^www\./, "");
+    const { data: mapped } = await supabase
+      .from("domains")
+      .select("ulb_id, ulbs!inner(slug, is_active)")
+      .in("hostname", [clean, bare, `www.${bare}`])
+      .limit(1);
+    const row = mapped?.[0] as { ulbs?: { slug: string; is_active: boolean } } | undefined;
+    if (row?.ulbs?.is_active) return { slug: row.ulbs.slug };
+  }
+
+  // 2. Fall back to deriving the slug from the hostname labels.
   const candidates = candidateSlugsFromHost(host);
   if (candidates.length === 0) return { slug: null };
   const { data } = await supabase
