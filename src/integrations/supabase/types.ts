@@ -205,6 +205,41 @@ export type Database = {
           },
         ]
       }
+      domains: {
+        Row: {
+          created_at: string
+          hostname: string
+          id: string
+          is_primary: boolean
+          ulb_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hostname: string
+          id?: string
+          is_primary?: boolean
+          ulb_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hostname?: string
+          id?: string
+          is_primary?: boolean
+          ulb_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "domains_ulb_id_fkey"
+            columns: ["ulb_id"]
+            isOneToOne: false
+            referencedRelation: "ulbs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gallery: {
         Row: {
           caption: string | null
@@ -622,6 +657,38 @@ export type Database = {
           },
         ]
       }
+      ulb_admins: {
+        Row: {
+          created_at: string
+          id: string
+          label: string | null
+          ulb_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          ulb_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          ulb_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ulb_admins_ulb_id_fkey"
+            columns: ["ulb_id"]
+            isOneToOne: false
+            referencedRelation: "ulbs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ulbs: {
         Row: {
           about: string | null
@@ -726,6 +793,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_manage_ulb: { Args: { _ulb_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
