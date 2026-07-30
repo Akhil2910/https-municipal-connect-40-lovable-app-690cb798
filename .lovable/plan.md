@@ -20,6 +20,12 @@ TXT   _lovable    lovable_verify=<value shown per domain>
 
 The A-record IP `185.158.133.1` is the same for every domain. The TXT verification value is unique per domain and is shown in Lovable when you add that domain.
 
+## About "error code: 1003" when you open the IP in a browser
+
+Typing `185.158.133.1` in the address bar returning `error code: 1003` is normal and does not mean the IP is wrong. That IP is a shared edge address that routes by domain name, so a request with no domain attached is rejected. The only correct way to use it is as the A-record target for a domain name — once NIC maps the domain to it, the domain opens the site over HTTPS.
+
+So: give NIC this IP for the form, but do not test it by browsing to the IP.
+
 Note: this is an anycast edge IP shared across Lovable-hosted sites, not a dedicated IP reserved for Telangana. It is stable and is the officially supported target for A records, but it is not an exclusive IP. If NIC's policy requires a dedicated IP owned by the department, that only comes from hosting on the SDC/NIC VM (covered in the separate self-hosting plan).
 
 ## Steps per municipality domain
