@@ -35,20 +35,20 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
   return (
     <header className="bg-card shadow-sm border-b">
       <div className="container mx-auto flex items-center gap-4 px-4 py-4">
-        <div className="hidden sm:flex items-center gap-3 shrink-0">
+        <div className="hidden sm:flex items-center gap-4 shrink-0">
           <img
             src={telanganaLogo.url}
             alt="Government of Telangana emblem"
-            width={64}
-            height={64}
-            className="h-14 w-14 md:h-16 md:w-16 object-contain"
+            width={96}
+            height={96}
+            className="h-20 w-20 md:h-24 md:w-24 object-contain"
           />
           <img
             src={risingLogo.url}
             alt="Telangana Rising 2047"
-            width={64}
-            height={64}
-            className="h-14 w-14 md:h-16 md:w-16 object-contain"
+            width={96}
+            height={96}
+            className="h-20 w-20 md:h-24 md:w-24 object-contain"
           />
         </div>
         <div className="flex-1 min-w-0">
@@ -62,14 +62,14 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
             Office of the Commissioner · ULB Code {ulb.code}
           </p>
         </div>
-        <div className="hidden md:flex items-center gap-4 shrink-0">
-          <figure className="flex flex-col items-center w-28">
+        <div className="hidden md:flex items-start gap-5 shrink-0">
+          <figure className="flex flex-col items-center w-32">
             <img
               src={sridevi.url}
               alt="Dr. T.K. Sreedevi IAS"
-              width={80}
-              height={80}
-              className="h-16 w-16 md:h-20 md:w-20 rounded-full object-cover object-center aspect-square border-2 border-gov-green shadow bg-gov-cream scale-110"
+              width={96}
+              height={96}
+              className="h-24 w-24 rounded-full object-cover object-center aspect-square border-2 border-gov-green shadow bg-gov-cream"
             />
             <figcaption className="mt-1 text-center leading-tight">
               <p className="text-[10px] font-bold text-gov-navy">Dr. T.K. Sreedevi IAS</p>
@@ -78,13 +78,13 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
               </p>
             </figcaption>
           </figure>
-          <figure className="flex flex-col items-center w-28">
+          <figure className="flex flex-col items-center w-32">
             <img
               src={cmPortrait}
               alt="Sri A. Revanth Reddy, Hon'ble Chief Minister"
-              width={72}
-              height={72}
-              className="h-16 w-16 md:h-20 md:w-20 rounded-full object-cover object-top aspect-square border-2 border-gov-saffron shadow"
+              width={96}
+              height={96}
+              className="h-24 w-24 rounded-full object-cover object-top aspect-square border-2 border-gov-saffron shadow"
             />
             <figcaption className="mt-1 text-center leading-tight">
               <p className="text-[10px] font-bold text-gov-navy">Sri A. Revanth Reddy</p>
