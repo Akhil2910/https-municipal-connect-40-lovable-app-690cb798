@@ -193,9 +193,9 @@ function AdminDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="ulbs">
+        <Tabs defaultValue={isSuper ? "ulbs" : "news"}>
           <TabsList className="flex flex-wrap h-auto">
-            <TabsTrigger value="ulbs">ULBs</TabsTrigger>
+            {isSuper && <TabsTrigger value="ulbs">ULBs</TabsTrigger>}
             <TabsTrigger value="news">News</TabsTrigger>
             <TabsTrigger value="notices">Notices</TabsTrigger>
             <TabsTrigger value="banners">Banners</TabsTrigger>
@@ -209,9 +209,11 @@ function AdminDashboard() {
             <TabsTrigger value="public_representatives">Public Reps</TabsTrigger>
             <TabsTrigger value="pages">About Pages</TabsTrigger>
             <TabsTrigger value="grievances">Grievances</TabsTrigger>
+            {isSuper && <TabsTrigger value="domains">Domains</TabsTrigger>}
+            {isSuper && <TabsTrigger value="admins">Admins</TabsTrigger>}
           </TabsList>
 
-          <TabsContent value="ulbs"><UlbsSection /></TabsContent>
+          {isSuper && <TabsContent value="ulbs"><UlbsSection /></TabsContent>}
           <TabsContent value="news"><CrudSection table="news" ulbId={ulbId} fields={newsFields} title="News" /></TabsContent>
           <TabsContent value="notices"><CrudSection table="notices" ulbId={ulbId} fields={noticesFields} title="Notices" /></TabsContent>
           <TabsContent value="banners"><CrudSection table="banners" ulbId={ulbId} fields={bannersFields} title="Banners" /></TabsContent>
@@ -225,6 +227,8 @@ function AdminDashboard() {
           <TabsContent value="public_representatives"><CrudSection table="public_representatives" ulbId={ulbId} fields={publicRepsFields} title="Public Representatives" /></TabsContent>
           <TabsContent value="pages"><CrudSection table="pages" ulbId={ulbId} fields={pagesFields} title="About / Content Pages" /></TabsContent>
           <TabsContent value="grievances"><GrievancesSection ulbId={ulbId} /></TabsContent>
+          {isSuper && <TabsContent value="domains"><DomainsSection ulbs={ulbs} /></TabsContent>}
+          {isSuper && <TabsContent value="admins"><AdminUsersSection ulbs={ulbs} /></TabsContent>}
         </Tabs>
       </main>
     </div>
