@@ -1,8 +1,8 @@
 import { Link, useParams } from "@tanstack/react-router";
 import emblem from "@/assets/ulb-emblem.png";
 import cmPortrait from "@/assets/cm-portrait.png";
-import telanganaLogo from "@/assets/telangana-logo.jpg";
-import risingLogo from "@/assets/rising-2047.png";
+import telanganaLogo from "@/assets/telangana-emblem.png.asset.json";
+import risingLogo from "@/assets/rising-2047-logo.png.asset.json";
 import sridevi from "@/assets/tk-sridevi.webp.asset.json";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useState } from "react";
@@ -37,14 +37,14 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
       <div className="container mx-auto flex items-center gap-4 px-4 py-4">
         <div className="hidden sm:flex items-center gap-3 shrink-0">
           <img
-            src={telanganaLogo}
+            src={telanganaLogo.url}
             alt="Government of Telangana emblem"
             width={64}
             height={64}
             className="h-14 w-14 md:h-16 md:w-16 object-contain"
           />
           <img
-            src={risingLogo}
+            src={risingLogo.url}
             alt="Telangana Rising 2047"
             width={64}
             height={64}
