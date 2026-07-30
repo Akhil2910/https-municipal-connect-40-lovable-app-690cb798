@@ -1,52 +1,85 @@
-# Public IP / A-record setup for the 21 municipality domains
+# Host all 21 municipality sites on AWS (EC2 + RDS + S3)
 
-## Answer for the NIC form field
+One codebase, one EC2 server, 21 domains. Each domain opens its own municipality site automatically — the app already resolves the municipality from the incoming hostname.
 
-"IP address to be mapped/Changed (Compulsory)":
-
-```text
-185.158.133.1
-```
-
-Use this same IP on all 21 municipality domain request forms, for both the root domain and `www`. If the form asks for a record type, choose **A**. Also give NIC the `_lovable` TXT verification value for that specific domain (unique per domain, shown in Lovable when the domain is added) — without it the domain will not verify.
-
-## The IP to give NIC
+## What you end up with
 
 ```text
-A     @      185.158.133.1
-A     www    185.158.133.1
-TXT   _lovable    lovable_verify=<value shown per domain>
+21 domains ──> Route 53 / registrar DNS ──> Elastic IP
+                                              │
+                                        EC2 (Ubuntu)
+                                    Nginx (SSL, 21 server blocks)
+                                              │
+                                     Node server (this app)
+                                        │            │
+                                  RDS Postgres    S3 bucket
+                                  (all content)   (photos, PDFs)
 ```
 
-The A-record IP `185.158.133.1` is the same for every domain. The TXT verification value is unique per domain and is shown in Lovable when you add that domain.
+Admin panel stays at `/admin` on every domain, managing all 21 from one login.
 
-## About "error code: 1003" when you open the IP in a browser
+## Part 1 — Make the app run as a plain Node server
 
-Typing `185.158.133.1` in the address bar returning `error code: 1003` is normal and does not mean the IP is wrong. That IP is a shared edge address that routes by domain name, so a request with no domain attached is rejected. The only correct way to use it is as the A-record target for a domain name — once NIC maps the domain to it, the domain opens the site over HTTPS.
+Today the app builds for an edge runtime. For an EC2 VM it must build a Node server bundle instead.
 
-So: give NIC this IP for the form, but do not test it by browsing to the IP.
+- Switch the build target from the Cloudflare preset to the Node preset.
+- Produce `.output/server/index.mjs` plus static assets, started with `node .output/server/index.mjs` on port 3000.
+- Move all runtime configuration to environment variables read inside server handlers (DB URL, S3 bucket, JWT secret) — no values baked into the build.
+- Add `ecosystem.config.cjs` for PM2 so the app restarts on crash and on reboot.
 
-Note: this is an anycast edge IP shared across Lovable-hosted sites, not a dedicated IP reserved for Telangana. It is stable and is the officially supported target for A records, but it is not an exclusive IP. If NIC's policy requires a dedicated IP owned by the department, that only comes from hosting on the SDC/NIC VM (covered in the separate self-hosting plan).
+## Part 2 — Replace the managed backend with RDS + S3
 
-## Steps per municipality domain
+This is the largest piece of work. Today the browser talks directly to the managed backend, and access rules live in the database as row-level policies. With plain RDS there is no such client-facing API, so every read and write must move behind server functions on the EC2 box.
 
-1. Project Settings -> Domains -> Connect existing domain.
-2. Enter the domain, e.g. `mulugumunicipality.gov.in`.
-3. Add the same domain again with the `www.` prefix (it is not added automatically).
-4. Hand NIC the three records above for that domain.
-5. Wait for propagation, then the status moves Verifying -> Setting up -> Active, and SSL is issued automatically.
-6. Repeat for all 21 domains on this same project.
+Work involved:
 
-No code change is needed: hostname-based routing in `src/lib/host.functions.ts` already maps each incoming domain to its municipality, so each domain opens its own site at `/`.
+1. **Schema export.** Generate one SQL file creating all 15 tables (`ulbs`, `news`, `notices`, `tenders`, `departments`, `gallery`, `banners`, `pages`, `leadership`, `council_members`, `co_option_members`, `public_representatives`, `services_info`, `grievances`, plus admin users) and load it into RDS.
+2. **Data export.** Dump all current rows (21 municipalities, councillors, news, gallery, pages) as INSERT statements and load them into RDS.
+3. **Data layer.** Add a Postgres connection pool on the server and rewrite every database call in the ~24 files that currently query the managed client into server functions that run SQL against RDS. Public pages get read-only queries; admin pages get authenticated write queries.
+4. **Auth.** Replace the hosted auth with an admin users table (email + bcrypt password hash) and an encrypted session cookie. `/admin/login` verifies the password server-side; every admin server function checks the session before writing. Row-level policies are replaced by this server-side check.
+5. **File storage.** Replace the current storage bucket with an S3 bucket. Admin uploads go through a server function that returns a pre-signed PUT URL; the browser uploads directly to S3; public images are served from the bucket (optionally via CloudFront).
+6. **Media migration.** Copy every existing uploaded image/PDF from the current storage into the S3 bucket and rewrite the stored URLs in the database.
 
-## What I can prepare next
+## Part 3 — AWS infrastructure
 
-- A one-page DNS request sheet for NIC listing all 21 domains with their required A/TXT records, ready to email.
-- A checklist to track connection status per municipality.
+- **EC2**: Ubuntu 22.04, t3.medium (2 vCPU / 4 GB) to start; t3.large if traffic grows. Elastic IP attached so the public IP never changes.
+- **Security group**: inbound 80, 443 from anywhere; 22 restricted to your office/VPN IP.
+- **RDS Postgres**: db.t3.small, 20 GB gp3, private subnet, automated daily backups, reachable only from the EC2 security group.
+- **S3**: one bucket for all municipalities, keys prefixed per municipality (`mulugu/gallery/...`), public read on objects, CORS allowing the 21 domains.
+- **Nginx**: reverse proxy to `127.0.0.1:3000`, one server block per domain, HTTP redirected to HTTPS.
+- **SSL**: Certbot issues and auto-renews certificates for all 21 domains and their `www` variants.
+
+## Part 4 — The 21 domains
+
+Because routing is hostname-based, no per-domain code or per-domain deployment is needed.
+
+1. Point each domain's A record (root and `www`) at the Elastic IP.
+2. Confirm each domain name contains its municipality name — for example `mulugumunicipality.in` resolves to Mulugu. For any domain that does not, add a single line to the existing hostname map so it points at the right municipality.
+3. Run Certbot once listing all 42 hostnames.
+4. Verify each domain opens its own homepage.
+
+## Part 5 — Handover package
+
+- `deploy/README.md`: full server setup from a blank EC2 instance to live site.
+- `deploy/schema.sql` and `deploy/data.sql`.
+- `deploy/nginx.conf` template and the Certbot command.
+- `.env.example` listing every required variable.
+- Update/rollback steps: `git pull`, build, `pm2 reload`.
 
 ## Technical notes
 
-- Root and `www` both need A records; pick one as Primary in Lovable and the other redirects.
-- Do not leave old/conflicting A or CNAME records on the same names.
-- If a CAA record exists, it must permit Let's Encrypt or SSL issuance fails.
-- If NIC fronts the domains with their own proxy/CDN, use the proxy option (CNAME-based verification) instead of A records.
+- Google Maps calls need a Google Cloud API key owned by your department, restricted to the 21 domains.
+- The weather panel calls an external API from the server — the EC2 instance needs outbound internet (NAT or public subnet).
+- Once the app runs against RDS, the Lovable preview here will no longer show live data unless it is also pointed at RDS. Recommended: finish content entry on the current backend first, then migrate.
+- Rough AWS cost: EC2 t3.medium ~$30/mo, RDS db.t3.small ~$25/mo, S3 + transfer ~$5/mo, Elastic IP free while attached — roughly $60-70/month plus domain fees.
+
+## Suggested order
+
+1. Node build target + PM2 config (app runs on a VM at all).
+2. RDS schema and data migration.
+3. Data layer and auth rewrite.
+4. S3 storage and media migration.
+5. EC2 + Nginx + SSL + the 21 domains.
+6. Handover docs.
+
+Steps 1-4 are code changes I can do here. Step 5 runs in your AWS account using the scripts and docs from step 6.
