@@ -24,7 +24,9 @@ export function AdminUsersSection({ ulbs }: { ulbs: { id: string; name: string; 
 
   async function load() {
     try {
-      setRows((await list()) as Row[]);
+      const res: any = await list();
+      const arr = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
+      setRows(arr as Row[]);
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to load admins");
     }
