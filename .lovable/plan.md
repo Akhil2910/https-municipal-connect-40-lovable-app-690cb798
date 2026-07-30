@@ -11,10 +11,9 @@ Short answer: yes, it can run entirely on a government (SDC / NIC / state cloud)
 
 **1. The build target.** The app is currently packaged for an edge runtime (Cloudflare Workers). A government server will be a normal Linux VM, so the build output must be switched to a Node.js server bundle and run behind nginx/Apache with a process manager. This is a configuration change, not a rewrite.
 
-**2. The database, auth, storage.** Today the database, admin login and all uploaded images live on Lovable Cloud. On a government server this becomes either:
-- a **self-hosted Supabase** instance (Docker) on the same VM/cluster — keeps the code unchanged, or
-- a plain **PostgreSQL** installed by NIC — this needs the data-access layer rewritten, so self-hosted Supabase is strongly preferred.
-The full schema and all existing content can be exported from here and restored there. Uploaded images move from Cloud storage to the server's disk or the state object store.
+**2. The database, auth, storage.** Today the database, admin login and all uploaded images live on Lovable Cloud. Recommended approach: run a **self-hosted Supabase** (Docker) on the same government VM/cluster — all data stays inside the government network and the application needs no rewrite. The full schema and all existing content can be exported from here and restored there; uploaded images move from Cloud storage to the server's disk.
+
+If NIC will only give a bare PostgreSQL with no Docker, the data, login and file-storage layer must be rewritten — a much larger job. Ask them for Docker so that is avoided.
 
 **3. External keys.** The weather / air-quality panel uses Google Maps through Lovable's connector. On a government server the department needs its own Google Maps API key (or the panel is switched to an IMD / TSDPS government feed instead).
 
