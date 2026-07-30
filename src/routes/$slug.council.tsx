@@ -63,8 +63,12 @@ function Council() {
       {ordered.length > 0 && (
         <Section title="Chairperson & Vice Chairperson" members={ordered} emptyLabel="" />
       )}
-      <Section title="Ward Members" members={ward} emptyLabel="Council member details will be published here shortly." />
-      <Section title="Co-option Members" members={coOption} emptyLabel="Co-option member details will be updated shortly." />
+      <section className="mt-12">
+        <MembersGrid
+          members={[...ward, ...coOption]}
+          emptyLabel="Council member details will be published here shortly."
+        />
+      </section>
       <Section title="Public Representatives" members={reps} emptyLabel="MPs, MLAs, and other public representatives will be listed here." />
     </div>
   );
