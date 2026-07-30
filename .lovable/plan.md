@@ -1,6 +1,14 @@
 # Public IP / A-record setup for the 21 municipality domains
 
-Good news: NIC can be given a real A record. Lovable custom domains are pointed with a fixed A-record IP.
+## Answer for the NIC form field
+
+"IP address to be mapped/Changed (Compulsory)":
+
+```text
+185.158.133.1
+```
+
+Use this same IP on all 21 municipality domain request forms, for both the root domain and `www`. If the form asks for a record type, choose **A**. Also give NIC the `_lovable` TXT verification value for that specific domain (unique per domain, shown in Lovable when the domain is added) — without it the domain will not verify.
 
 ## The IP to give NIC
 
