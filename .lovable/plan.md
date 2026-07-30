@@ -1,85 +1,80 @@
-# Host all 21 municipality sites on AWS (EC2 + RDS + S3)
+# Run locally on PostgreSQL + S3, then deploy to AWS with 21 domains
 
-One codebase, one EC2 server, 21 domains. Each domain opens its own municipality site automatically — the app already resolves the municipality from the incoming hostname.
+Same codebase, same pages, same admin panel. Nothing about the site structure, layout, or existing content changes — only the backend it talks to and how it is run.
 
-## What you end up with
+Order of work: make it run on your own PostgreSQL + S3 locally first, verify everything, then deploy the exact same build to an AWS EC2 instance, give NIC the public IP, and map each domain they issue to one municipality.
+
+## Part 1 — Local: PostgreSQL instead of the hosted backend
+
+- Add a PostgreSQL connection pool on the server, configured by `DATABASE_URL` in `.env`.
+- Export the current schema (all existing tables: `ulbs`, `news`, `notices`, `tenders`, `departments`, `gallery`, `banners`, `pages`, `leadership`, `council_members`, `co_option_members`, `public_representatives`, `services_info`, `grievances`) to `deploy/schema.sql` — column-for-column identical, so no page changes.
+- Export all current rows to `deploy/data.sql` (21 municipalities, all councillors, news, gallery, pages).
+- Move every database call in the page and admin files behind server functions that run SQL against PostgreSQL. Each page keeps the exact same data shape it renders today.
+- `bun install`, load the two SQL files into local Postgres, `bun run dev` — full site running on your machine with your own database.
+
+## Part 2 — Two levels of admin
+
+New `admin_users` table: email, password hash, role (`super_admin` or `ulb_admin`), and `ulb_id` (empty for super admin).
+
+- **Super admin** — one account. Sees the municipality dropdown, can manage all 21, can create and delete municipality admins, and owns the domain mapping screen.
+- **Municipality admin** — one account per municipality. Logs in at the same `/admin/login`, no dropdown; the panel is locked to their own municipality. Every save is checked server-side against their `ulb_id`, so one municipality's admin can never edit another's content.
+
+Login verifies the password on the server and issues an encrypted session cookie. Existing admin screens stay as they are; they just receive a scoped municipality list.
+
+## Part 3 — File storage on S3
+
+- Replace the current storage bucket with one S3 bucket, keys prefixed per municipality (`mulugu/gallery/...`).
+- Admin upload asks the server for a pre-signed upload URL, browser uploads straight to S3, the public URL is saved in the database — same upload button, same behaviour.
+- Existing uploaded images and PDFs are copied into the bucket and their URLs updated in the database.
+- Locally this works against the real S3 bucket using credentials in `.env`, so the upload path is proven before deployment.
+
+## Part 4 — Deploy to AWS
+
+- Build a plain Node server bundle (instead of the current edge build) started with `node .output/server/index.mjs` on port 3000, kept alive by PM2.
+- EC2 Ubuntu instance with an **Elastic IP** — this is the fixed public IP you give NIC.
+- Nginx in front on ports 80/443, proxying to the Node process; Certbot for SSL.
+- RDS PostgreSQL in a private subnet, reachable only from the EC2 instance; the same `schema.sql` and `data.sql` load into it.
+- Suggested size: EC2 t3.medium, RDS db.t3.small, 20 GB storage.
+
+## Part 5 — Giving each domain to each municipality
+
+New `domains` table: hostname, municipality, primary flag. A **Domain Mapping** screen in the super admin panel lets you add a row like `mulugumunicipality.telangana.gov.in → Mulugu`.
+
+How it works end to end:
 
 ```text
-21 domains ──> Route 53 / registrar DNS ──> Elastic IP
-                                              │
-                                        EC2 (Ubuntu)
-                                    Nginx (SSL, 21 server blocks)
-                                              │
-                                     Node server (this app)
-                                        │            │
-                                  RDS Postgres    S3 bucket
-                                  (all content)   (photos, PDFs)
+Visitor opens mulugumunicipality.telangana.gov.in
+        │
+NIC DNS: A record -> your Elastic IP
+        │
+Nginx on EC2 (one certificate covering all 21 hostnames)
+        │
+App reads the Host header, looks it up in the domains table
+        │
+Serves the Mulugu site at "/"
 ```
 
-Admin panel stays at `/admin` on every domain, managing all 21 from one login.
+Steps once NIC issues the domains:
 
-## Part 1 — Make the app run as a plain Node server
+1. Give NIC the Elastic IP; they point each domain's A record (root and `www`) at it.
+2. In the super admin Domain Mapping screen, add each hostname and pick its municipality. No code change, no redeploy per domain.
+3. Add the hostnames to the Nginx server block and run Certbot once for all of them.
+4. Open each domain and confirm it lands on the right municipality homepage.
 
-Today the app builds for an edge runtime. For an EC2 VM it must build a Node server bundle instead.
-
-- Switch the build target from the Cloudflare preset to the Node preset.
-- Produce `.output/server/index.mjs` plus static assets, started with `node .output/server/index.mjs` on port 3000.
-- Move all runtime configuration to environment variables read inside server handlers (DB URL, S3 bucket, JWT secret) — no values baked into the build.
-- Add `ecosystem.config.cjs` for PM2 so the app restarts on crash and on reboot.
-
-## Part 2 — Replace the managed backend with RDS + S3
-
-This is the largest piece of work. Today the browser talks directly to the managed backend, and access rules live in the database as row-level policies. With plain RDS there is no such client-facing API, so every read and write must move behind server functions on the EC2 box.
-
-Work involved:
-
-1. **Schema export.** Generate one SQL file creating all 15 tables (`ulbs`, `news`, `notices`, `tenders`, `departments`, `gallery`, `banners`, `pages`, `leadership`, `council_members`, `co_option_members`, `public_representatives`, `services_info`, `grievances`, plus admin users) and load it into RDS.
-2. **Data export.** Dump all current rows (21 municipalities, councillors, news, gallery, pages) as INSERT statements and load them into RDS.
-3. **Data layer.** Add a Postgres connection pool on the server and rewrite every database call in the ~24 files that currently query the managed client into server functions that run SQL against RDS. Public pages get read-only queries; admin pages get authenticated write queries.
-4. **Auth.** Replace the hosted auth with an admin users table (email + bcrypt password hash) and an encrypted session cookie. `/admin/login` verifies the password server-side; every admin server function checks the session before writing. Row-level policies are replaced by this server-side check.
-5. **File storage.** Replace the current storage bucket with an S3 bucket. Admin uploads go through a server function that returns a pre-signed PUT URL; the browser uploads directly to S3; public images are served from the bucket (optionally via CloudFront).
-6. **Media migration.** Copy every existing uploaded image/PDF from the current storage into the S3 bucket and rewrite the stored URLs in the database.
-
-## Part 3 — AWS infrastructure
-
-- **EC2**: Ubuntu 22.04, t3.medium (2 vCPU / 4 GB) to start; t3.large if traffic grows. Elastic IP attached so the public IP never changes.
-- **Security group**: inbound 80, 443 from anywhere; 22 restricted to your office/VPN IP.
-- **RDS Postgres**: db.t3.small, 20 GB gp3, private subnet, automated daily backups, reachable only from the EC2 security group.
-- **S3**: one bucket for all municipalities, keys prefixed per municipality (`mulugu/gallery/...`), public read on objects, CORS allowing the 21 domains.
-- **Nginx**: reverse proxy to `127.0.0.1:3000`, one server block per domain, HTTP redirected to HTTPS.
-- **SSL**: Certbot issues and auto-renews certificates for all 21 domains and their `www` variants.
-
-## Part 4 — The 21 domains
-
-Because routing is hostname-based, no per-domain code or per-domain deployment is needed.
-
-1. Point each domain's A record (root and `www`) at the Elastic IP.
-2. Confirm each domain name contains its municipality name — for example `mulugumunicipality.in` resolves to Mulugu. For any domain that does not, add a single line to the existing hostname map so it points at the right municipality.
-3. Run Certbot once listing all 42 hostnames.
-4. Verify each domain opens its own homepage.
-
-## Part 5 — Handover package
-
-- `deploy/README.md`: full server setup from a blank EC2 instance to live site.
-- `deploy/schema.sql` and `deploy/data.sql`.
-- `deploy/nginx.conf` template and the Certbot command.
-- `.env.example` listing every required variable.
-- Update/rollback steps: `git pull`, build, `pm2 reload`.
+Until a domain is mapped, the site still works at `/mulugu`, `/asifabad`, etc., so nothing breaks while NIC processes the requests.
 
 ## Technical notes
 
-- Google Maps calls need a Google Cloud API key owned by your department, restricted to the 21 domains.
-- The weather panel calls an external API from the server — the EC2 instance needs outbound internet (NAT or public subnet).
-- Once the app runs against RDS, the Lovable preview here will no longer show live data unless it is also pointed at RDS. Recommended: finish content entry on the current backend first, then migrate.
-- Rough AWS cost: EC2 t3.medium ~$30/mo, RDS db.t3.small ~$25/mo, S3 + transfer ~$5/mo, Elastic IP free while attached — roughly $60-70/month plus domain fees.
+- Everything in Parts 1-3 is code I write here; the app still runs in this preview during the work, pointed at whichever database is configured.
+- `.env.example` will list every variable: `DATABASE_URL`, `SESSION_SECRET`, `S3_BUCKET`, `S3_REGION`, AWS keys, `GOOGLE_MAPS_API_KEY`.
+- Google Maps needs a department-owned API key restricted to the 21 domains.
+- `deploy/README.md` will contain the full local setup and the blank-EC2-to-live-site steps, so your team can rebuild it without me.
+- Rough AWS cost: about $60-70/month for EC2 + RDS + S3.
 
-## Suggested order
+## Build order
 
-1. Node build target + PM2 config (app runs on a VM at all).
-2. RDS schema and data migration.
-3. Data layer and auth rewrite.
-4. S3 storage and media migration.
-5. EC2 + Nginx + SSL + the 21 domains.
-6. Handover docs.
-
-Steps 1-4 are code changes I can do here. Step 5 runs in your AWS account using the scripts and docs from step 6.
+1. PostgreSQL schema, data export, and data layer (runs locally).
+2. Admin users table, login, and super admin / municipality admin scoping.
+3. S3 uploads and media migration.
+4. Domains table and the Domain Mapping screen.
+5. Node build target, PM2 config, Nginx template, and the deployment README.
