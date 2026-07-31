@@ -119,8 +119,22 @@ PORT=3000
 
 ### Step 6 — Load the database
 ```bash
+psql "$DATABASE_URL" -f deploy/00-prereqs.sql
 psql "$DATABASE_URL" -f deploy/schema.sql
 psql "$DATABASE_URL" -f deploy/data.sql
+```
+
+- `00-prereqs.sql` — creates the `auth` schema, `auth.users`, `auth.uid()` and the
+  `anon` / `authenticated` / `service_role` roles that the policies reference. Run it first on any
+  plain PostgreSQL (RDS or local).
+- `schema.sql` — all tables, enums, functions, grants and row-level-security policies.
+- `data.sql` — every current row (21 municipalities, council/co-option members, news, notices,
+  tenders, gallery, pages, domains) as `INSERT` statements.
+
+Re-export at any time from a machine that can reach the current database:
+```bash
+pg_dump "$SOURCE_URL" --schema=public --schema-only --no-owner --no-privileges > deploy/schema.sql
+pg_dump "$SOURCE_URL" --schema=public --data-only  --no-owner --column-inserts > deploy/data.sql
 ```
 
 ### Step 7 — Nginx + SSL
