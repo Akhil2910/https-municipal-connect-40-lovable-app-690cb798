@@ -55,7 +55,6 @@ export function TopGovBar({ ulbName }: { ulbName?: string }) {
           </div>
           <span className="hidden md:inline-block h-4 w-px bg-white/30 mx-1" />
           <div className="flex items-center gap-3 opacity-90">
-            <Link to="/" className="hover:underline">All Municipalities</Link>
             <a href="#main" className="hover:underline hidden sm:inline">Skip to content</a>
             <Link to="/admin/login" className="hover:underline">Staff Login</Link>
           </div>
