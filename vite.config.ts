@@ -6,4 +6,10 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-export default defineConfig();
+// DEPLOY_TARGET=node  -> build a plain Node.js server (used for AWS EC2).
+// Unset               -> Lovable's default edge build (used by Lovable hosting).
+export default defineConfig(
+  process.env.DEPLOY_TARGET === "node"
+    ? { nitro: { preset: "node-server" } }
+    : {},
+);
