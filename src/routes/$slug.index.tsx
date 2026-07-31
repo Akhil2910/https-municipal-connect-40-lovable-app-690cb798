@@ -4,7 +4,7 @@ import { useUlb } from "./$slug";
 import { Ticker } from "@/components/site/Ticker";
 import { OnlineServices } from "@/components/site/OnlineServices";
 import { WeatherPanel } from "@/components/site/WeatherPanel";
-import hero from "@/assets/hero-default.jpg";
+const hero = "/images/hero-default.jpg";
 import { ArrowRight, Users, MapPin, Calendar, Landmark, Target, Eye, Map as MapIcon } from "lucide-react";
 import type { News, Notice, Banner, Leadership } from "@/lib/ulb-types";
 import { useEffect, useState } from "react";

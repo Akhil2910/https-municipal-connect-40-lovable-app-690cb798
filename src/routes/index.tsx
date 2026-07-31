@@ -3,8 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { getHostSlug } from "@/lib/host.functions";
 import { TopGovBar } from "@/components/site/TopGovBar";
 import { Footer } from "@/components/site/Footer";
-import emblem from "@/assets/ulb-emblem.png";
-import hero from "@/assets/hero-default.jpg";
+const emblem = "/logos/ulb-emblem.png";
+const hero = "/images/hero-default.jpg";
 import { Building2, ArrowRight } from "lucide-react";
 import type { Ulb } from "@/lib/ulb-types";
 
