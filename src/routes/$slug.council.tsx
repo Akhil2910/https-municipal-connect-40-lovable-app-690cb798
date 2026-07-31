@@ -65,11 +65,10 @@ function Council() {
       )}
       <section className="mt-12">
         <MembersGrid
-          members={[...ward, ...coOption]}
+          members={[...ward, ...reps, ...coOption]}
           emptyLabel="Council member details will be published here shortly."
         />
       </section>
-      <Section title="Public Representatives" members={reps} emptyLabel="MPs, MLAs, and other public representatives will be listed here." />
     </div>
   );
 }
