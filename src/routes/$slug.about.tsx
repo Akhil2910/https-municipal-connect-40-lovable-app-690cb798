@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useUlb } from "./$slug";
 import { supabase } from "@/integrations/supabase/client";
-import cmPortrait from "@/assets/cm-portrait.png";
+const cmPortrait = "/logos/cm-portrait.png";
 import type { Leadership } from "@/lib/ulb-types";
 
 export const Route = createFileRoute("/$slug/about")({

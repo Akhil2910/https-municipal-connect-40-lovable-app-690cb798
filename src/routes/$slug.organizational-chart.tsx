@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useUlb } from "./$slug";
-import orgChart from "@/assets/org-chart.jpg.asset.json";
+const orgChart = "/images/org-chart.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import type { Page } from "@/lib/ulb-types";
 
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/$slug/organizational-chart")({
 function OrgChart() {
   const ulb = useUlb();
   const { page } = Route.useLoaderData() as { page: Page | null };
-  const image = page?.image_url || orgChart.url;
+  const image = page?.image_url || orgChart;
   return (
     <div className="container mx-auto px-4 py-12 max-w-5xl">
       <p className="text-xs font-bold uppercase tracking-[0.3em] text-accent">About</p>
