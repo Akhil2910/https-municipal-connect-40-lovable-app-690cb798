@@ -2,7 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict jbvvuhwoUKTWprruTqAlhcELcblq6bpNTkjX7f2iCNIPdPBDnOqxjad4EJvxJSb
 
 -- Dumped from database version 17.6
 -- Dumped by pg_dump version 17.9
@@ -1274,5 +1273,4 @@ ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict jbvvuhwoUKTWprruTqAlhcELcblq6bpNTkjX7f2iCNIPdPBDnOqxjad4EJvxJSb
 
