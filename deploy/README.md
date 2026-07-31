@@ -219,6 +219,7 @@ Leave that terminal open, then in pgAdmin connect to Host `localhost`, Port `543
 Host `localhost`, Port `5432`, user `postgres`, database `ulb_portal`:
 ```bash
 createdb ulb_portal
+psql -d ulb_portal -f deploy/00-prereqs.sql
 psql -d ulb_portal -f deploy/schema.sql
 psql -d ulb_portal -f deploy/data.sql
 ```
