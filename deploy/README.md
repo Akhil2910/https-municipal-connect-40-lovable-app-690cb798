@@ -1,242 +1,372 @@
-# Deployment Guide — Telangana ULB Portal (21 municipalities)
+# How to put the Municipal Portal online (step-by-step)
 
-Three parts:
-1. Get the code into Git (GitHub)
-2. Host it on AWS (EC2 + Nginx + RDS PostgreSQL + S3)
-3. Connect to the database from pgAdmin on your own machine
+This guide assumes you have never done this before. Follow the parts in order.
+Every step says **what you should see** when it worked.
+
+Words used here:
+- **Terminal** - the black window where you type commands. On Windows use "PowerShell",
+  on Mac use "Terminal".
+- **Server** - a computer in the cloud (AWS) that stays on all the time.
+- **Domain** - a web address like `mulugumunicipality.in`.
+
+What we are building:
+
+```text
+   visitor's browser
+          |
+     [ your domain ]
+          |
+   AWS server (one computer, one fixed IP)
+          |-- Nginx      : receives all visits, knows nothing else
+          |-- The website: Node.js app on port 3000
+          |-- The backend: PostgreSQL 16 + login + file storage (Docker), port 8000
+          |-- AWS S3     : stores uploaded photos
+```
+
+One server runs **all 21 municipality websites**. Which site a visitor sees is
+decided by the domain they typed.
 
 ---
 
-## Part 1 — Push the code to Git
+## Part 1 - Run it on your own computer first
 
-### Option A (recommended) — from Lovable
-1. In the editor, click the **+** button next to the chat input (bottom-left).
-2. Choose **GitHub → Connect project**.
-3. Authorize the Lovable GitHub App and pick the account/organisation (e.g. the department's GitHub org).
-4. Click **Create Repository**. The full codebase is pushed automatically.
-5. From then on it is two-way: edits here push to GitHub, pushes to GitHub sync back here.
+Do this before touching AWS. If it works here, it will work there.
 
-### Option B — manual, from your machine
+### 1.1 Install the tools
+
+| Tool | Download | Check it worked |
+|------|----------|-----------------|
+| Node.js 20+ | https://nodejs.org (choose "LTS") | `node -v` prints `v20...` or higher |
+| Docker Desktop | https://docker.com/products/docker-desktop | `docker -v` prints a version |
+| Git | https://git-scm.com/downloads | `git -v` prints a version |
+
+### 1.2 Get the code
+
+If you already have the project folder, skip this. Otherwise:
+
 ```bash
-# after downloading the codebase zip from the editor (Download codebase)
+git clone <your-repository-url> municipal-portal
 cd municipal-portal
+```
+
+### 1.3 Install the website's parts
+
+```bash
+npm install
+```
+You should see a lot of text and then no red "ERR!" lines.
+
+### 1.4 Create your settings file
+
+```bash
+cp deploy/.env.example .env
+bash deploy/generate-keys.sh
+```
+The second command prints four lines. Open `.env` in a text editor and paste
+those four lines over the matching lines. Also set `POSTGRES_PASSWORD` to any
+strong password you invent.
+
+Leave `VITE_SUPABASE_URL` and `SUPABASE_URL` as `http://localhost:8000` for now.
+
+### 1.5 Start the backend (database + login + files)
+
+```bash
+docker compose -f deploy/docker-compose.yml --env-file .env up -d
+```
+Check it:
+```bash
+docker ps
+```
+You should see five containers: `portal-db`, `portal-auth`, `portal-rest`,
+`portal-storage`, `portal-gateway`.
+
+### 1.6 Load the database
+
+Run these **in this order**:
+
+```bash
+docker exec -i portal-db psql -U postgres < deploy/schema.sql
+docker exec -i portal-db psql -U postgres < deploy/data.sql
+docker exec -i portal-db psql -U postgres < deploy/03-admins.sql
+```
+
+The last command prints a table of email addresses. That means the logins were
+created:
+
+- Super admin: `superadmin@portal.local` / `superadmin@321`
+- Each municipality: `<name>admin@portal.local` / `<name>@123`
+  (for example `muluguadmin@portal.local` / `mulugu@123`)
+
+> `deploy/00-prereqs.sql` is **only** needed if you run a plain PostgreSQL
+> database without the login container. With the Docker setup above, skip it.
+
+### 1.7 Start the website
+
+```bash
+npm run dev
+```
+Open http://localhost:8080 in your browser. You should see a municipality site.
+Then open http://localhost:8080/admin/login and sign in as the super admin.
+
+**If you see "Missing Supabase environment variable"** - your `.env` is not filled
+in correctly. Go back to step 1.4.
+
+---
+
+## Part 2 - Put the code on GitHub
+
+1. Create a free account at https://github.com.
+2. Click **New repository**, name it `municipal-portal`, keep it **Private**, click
+   **Create repository**.
+3. In your project folder:
+
+```bash
 git init
 git add .
-git commit -m "Initial commit: Telangana ULB portal"
+git commit -m "Municipal portal"
 git branch -M main
-git remote add origin https://github.com/<org>/<repo>.git
+git remote add origin https://github.com/<your-username>/municipal-portal.git
 git push -u origin main
 ```
 
-### Everyday Git commands
-```bash
-git pull origin main          # get latest
-git checkout -b feature/xyz   # new branch
-git add . && git commit -m "message"
-git push origin feature/xyz   # then open a Pull Request
-```
+You should see your files on the GitHub page after refreshing.
 
-`.env` must never be committed. Keep a `.env.example` with variable names only.
+> `.env` is never uploaded - it holds your passwords. That is on purpose.
 
 ---
 
-## Part 2 — Host on AWS
+## Part 3 - Create the AWS pieces
 
-Target architecture:
+Sign in at https://console.aws.amazon.com. Pick region **Asia Pacific (Mumbai)
+ap-south-1** in the top-right corner and keep it for everything.
 
-```text
-  21 domains (NIC)  ->  A record  ->  Elastic IP
-                                        |
-                                   EC2 (Ubuntu)
-                                   Nginx :80/:443
-                                        |
-                                Node app :3000 (PM2)
-                                     /        \
-                            RDS PostgreSQL    S3 bucket
-                            (private subnet)  (images/PDFs)
-```
+### 3.1 The server (EC2)
 
-### Step 1 — Create the RDS PostgreSQL database
-1. AWS Console → **RDS → Create database**.
-2. Engine: **PostgreSQL 16**. Template: Production (or Dev/Test to save cost).
-3. Instance: `db.t3.small`, Storage 20 GB gp3.
-4. DB identifier: `ulb-portal-db`; Master username: `ulbadmin`; set a strong master password and store it safely.
-5. Connectivity: same VPC as the EC2 instance, **Public access = No** (see Part 3 for pgAdmin access via SSH tunnel).
-6. Create a security group `rds-sg` allowing inbound **TCP 5432 only from the EC2 security group**.
-7. Note the endpoint: `ulb-portal-db.xxxxx.ap-south-1.rds.amazonaws.com`.
+1. Search **EC2** -> **Instances** -> **Launch instances**.
+2. Name: `municipal-portal`.
+3. Image: **Ubuntu Server 24.04 LTS**.
+4. Instance type: **t3.large** (2 vCPU / 8 GB). Use **t3.xlarge** if all 21 sites get busy.
+5. Key pair: **Create new key pair**, name it `portal-key`, type RSA, format `.pem`.
+   It downloads a file - **keep it safe, you cannot download it again**.
+6. Network settings -> **Edit** -> Allow: SSH (22), HTTP (80), HTTPS (443).
+7. Storage: change 8 GB to **50 GB**.
+8. **Launch instance**.
 
-### Step 2 — Create the S3 bucket
-1. **S3 → Create bucket**, name `ulb-portal-media`, region `ap-south-1`.
-2. Block all public access **on**; serve files through the app/CloudFront or pre-signed URLs.
-3. Add CORS on the bucket so browser uploads work:
-```json
-[{"AllowedHeaders":["*"],"AllowedMethods":["GET","PUT"],"AllowedOrigins":["https://*.telangana.gov.in"],"ExposeHeaders":["ETag"]}]
-```
-4. **IAM → Users → Create user** `ulb-portal-app`, attach a policy allowing `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject`, `s3:ListBucket` on that bucket only. Save the access key and secret.
+### 3.2 The fixed IP (Elastic IP)
 
-### Step 3 — Launch the EC2 instance
-1. **EC2 → Launch instance**: Ubuntu 24.04 LTS, `t3.medium`, 30 GB gp3.
-2. Create/download a key pair `ulb-portal.pem`.
-3. Security group `web-sg`: inbound **22 (your office IP only)**, **80**, **443** from anywhere.
-4. **Elastic IP → Allocate → Associate** with this instance. **This fixed IP is what you give NIC.**
+1. EC2 -> **Elastic IPs** -> **Allocate Elastic IP address** -> **Allocate**.
+2. Select it -> **Actions** -> **Associate Elastic IP address** -> choose your
+   instance -> **Associate**.
+3. Write this IP down. This is the number NIC asks for.
 
-### Step 4 — Prepare the server
+### 3.3 The photo storage (S3)
+
+1. Search **S3** -> **Create bucket**.
+2. Name: `municipal-portal-uploads-<something-unique>`, region Mumbai.
+3. Uncheck **Block all public access** (uploaded photos must be viewable), tick the
+   confirmation box. Create.
+4. Search **IAM** -> **Users** -> **Create user** -> name `portal-s3`.
+5. Attach policy **AmazonS3FullAccess** -> Create user.
+6. Open the user -> **Security credentials** -> **Create access key** -> choose
+   "Application running outside AWS" -> copy the **Access key** and **Secret access key**.
+
+### 3.4 Connect to the server
+
+On your computer, in the folder where `portal-key.pem` was downloaded:
+
 ```bash
-ssh -i ulb-portal.pem ubuntu@<ELASTIC_IP>
+chmod 400 portal-key.pem
+ssh -i portal-key.pem ubuntu@<YOUR ELASTIC IP>
+```
+Type `yes` when asked. You should now see a prompt like `ubuntu@ip-172-...:~$`.
+Everything from here is typed **on the server**.
 
+---
+
+## Part 4 - Install and run the app on the server
+
+### 4.1 Install the tools
+
+```bash
 sudo apt update && sudo apt upgrade -y
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs nginx postgresql-client git
+sudo apt install -y nodejs nginx git
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker ubuntu
 sudo npm install -g pm2
-curl -fsSL https://bun.sh/install | bash && source ~/.bashrc
+exit
 ```
+Log in again with the same `ssh` command (this makes Docker work without `sudo`).
 
-### Step 5 — Deploy the app
+### 4.2 Get the code
+
 ```bash
-cd /var/www
-sudo git clone https://github.com/<org>/<repo>.git ulb-portal
-sudo chown -R ubuntu:ubuntu ulb-portal
-cd ulb-portal
-bun install
-
-nano .env      # see variables below
-bun run build
-pm2 start ".output/server/index.mjs" --name ulb-portal
-pm2 save && pm2 startup     # run the command it prints
+git clone https://github.com/<your-username>/municipal-portal.git
+cd municipal-portal
+npm install
 ```
 
-`.env` on the server:
+### 4.3 Settings for production
+
 ```bash
-DATABASE_URL=postgresql://ulbadmin:<password>@ulb-portal-db.xxxxx.ap-south-1.rds.amazonaws.com:5432/postgres
-SESSION_SECRET=<64-char random string>
-S3_BUCKET=ulb-portal-media
-S3_REGION=ap-south-1
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
-GOOGLE_MAPS_API_KEY=...
-PORT=3000
+cp deploy/.env.example .env
+bash deploy/generate-keys.sh
+nano .env
 ```
+Fill in:
+- the four generated lines
+- `POSTGRES_PASSWORD` - a strong password
+- `VITE_SUPABASE_URL` and `SUPABASE_URL` -> `https://api.<your-domain>`
+  (use `http://<YOUR ELASTIC IP>:8000` only if you do not have a domain yet)
+- `STORAGE_BACKEND=s3`, `AWS_S3_BUCKET`, `AWS_REGION=ap-south-1`,
+  `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` from step 3.3
 
-### Step 6 — Load the database
+Save with `Ctrl+O`, `Enter`, then `Ctrl+X`.
+
+### 4.4 Start the backend and load the database
+
 ```bash
-psql "$DATABASE_URL" -f deploy/00-prereqs.sql
-psql "$DATABASE_URL" -f deploy/schema.sql
-psql "$DATABASE_URL" -f deploy/data.sql
+docker compose -f deploy/docker-compose.yml --env-file .env up -d
+docker exec -i portal-db psql -U postgres < deploy/schema.sql
+docker exec -i portal-db psql -U postgres < deploy/data.sql
+docker exec -i portal-db psql -U postgres < deploy/03-admins.sql
 ```
 
-- `00-prereqs.sql` — creates the `auth` schema, `auth.users`, `auth.uid()` and the
-  `anon` / `authenticated` / `service_role` roles that the policies reference. Run it first on any
-  plain PostgreSQL (RDS or local).
-- `schema.sql` — all tables, enums, functions, grants and row-level-security policies.
-- `data.sql` — every current row (21 municipalities, council/co-option members, news, notices,
-  tenders, gallery, pages, domains) as `INSERT` statements.
+### 4.5 Build and start the website
 
-Re-export at any time from a machine that can reach the current database:
 ```bash
-pg_dump "$SOURCE_URL" --schema=public --schema-only --no-owner --no-privileges > deploy/schema.sql
-pg_dump "$SOURCE_URL" --schema=public --data-only  --no-owner --column-inserts > deploy/data.sql
+npm run build:node
+pm2 start "npm run start" --name portal
+pm2 save
+pm2 startup       # copy the command it prints and run it - this survives reboots
 ```
-
-### Step 7 — Nginx + SSL
-`/etc/nginx/sites-available/ulb-portal`:
-```nginx
-server {
-    listen 80;
-    server_name mulugumunicipality.telangana.gov.in www.mulugumunicipality.telangana.gov.in
-                asifabadmunicipality.telangana.gov.in www.asifabadmunicipality.telangana.gov.in;
-                # ... add all 21 domains and their www variants
-
-    client_max_body_size 25M;
-
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;              # required: the app routes by hostname
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-    }
-}
-```
+Check:
 ```bash
-sudo ln -s /etc/nginx/sites-available/ulb-portal /etc/nginx/sites-enabled/
+curl -I http://localhost:3000
+```
+You should see `HTTP/1.1 200 OK`.
+
+---
+
+## Part 5 - Domains and HTTPS
+
+### 5.1 Give NIC the IP
+
+Open `deploy/NIC-DNS.md`, fill in your Elastic IP and the 21 domains, send it to NIC.
+They create `A` records. Wait until `ping yourdomain.gov.in` returns your IP.
+
+### 5.2 Tell Nginx about the domains
+
+```bash
+sudo cp deploy/nginx.conf /etc/nginx/sites-available/portal
+sudo nano /etc/nginx/sites-available/portal
+```
+Replace the `_` in `server_name` with all your domains separated by spaces
+(both `example.gov.in` and `www.example.gov.in`), and set the API server_name to
+`api.<your-domain>`. Then:
+
+```bash
 sudo rm -f /etc/nginx/sites-enabled/default
+sudo ln -s /etc/nginx/sites-available/portal /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
+```
+`nginx -t` must say **syntax is ok** and **test is successful**.
 
+Now open `http://yourdomain.gov.in` in a browser - the site should load.
+
+### 5.3 Turn on HTTPS (the padlock)
+
+```bash
 sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx     # select all listed domains; auto-renew is installed
+sudo certbot --nginx -d example.gov.in -d www.example.gov.in -d api.example.gov.in
 ```
+Add `-d domain -d www.domain` for every municipality in the same command.
+Choose "redirect" when asked. Renewal happens automatically.
 
-### Step 8 — Give each domain to each municipality
-1. Give NIC the **Elastic IP**; they create an A record for each domain (root + `www`) pointing at it.
-2. Log in at `https://<any-domain>/admin/login` as the super admin.
-3. Open the **Domains** tab → enter hostname → pick the municipality → **Add domain**.
-4. Visit the domain — it opens that municipality's homepage at `/`. No redeploy needed per domain.
+### 5.4 Link each domain to its municipality
 
-### Redeploying after a code change
-```bash
-cd /var/www/ulb-portal && git pull && bun install && bun run build && pm2 restart ulb-portal
-```
+Go to `https://<any-of-your-domains>/admin/login`, sign in as super admin, open the
+**Domains** tab, and add each hostname next to its municipality. Save.
+
+Visit each domain - it should now open that municipality's own homepage at `/`.
 
 ---
 
-## Part 3 — Connect to the database from pgAdmin on your PC
+## Part 6 - Look at the database from your own computer (pgAdmin)
 
-RDS sits in a private subnet, so connect through an SSH tunnel via the EC2 instance. This is the secure, recommended way.
-
-### Option A — SSH tunnel inside pgAdmin (easiest)
-1. Open pgAdmin → right-click **Servers → Register → Server**.
-2. **General** tab → Name: `ULB Portal RDS`.
-3. **Connection** tab:
-   - Host: the RDS endpoint, `ulb-portal-db.xxxxx.ap-south-1.rds.amazonaws.com`
-   - Port: `5432`
-   - Maintenance database: `postgres`
-   - Username: `ulbadmin`
-   - Password: the RDS master password (tick *Save password*)
-4. **SSH Tunnel** tab:
-   - Use SSH tunnelling: **Yes**
-   - Tunnel host: `<ELASTIC_IP>`  ·  Tunnel port: `22`
+1. Install pgAdmin: https://www.pgadmin.org/download/
+2. Right-click **Servers** -> **Register** -> **Server**.
+3. **General** tab: Name `Municipal Portal`.
+4. **Connection** tab: Host `localhost`, Port `5432`, Database `postgres`,
+   Username `postgres`, Password = your `POSTGRES_PASSWORD`.
+5. **SSH Tunnel** tab: turn it **on**.
+   - Tunnel host: your Elastic IP
+   - Tunnel port: 22
    - Username: `ubuntu`
-   - Authentication: **Identity file** → select `ulb-portal.pem`
-5. **Save**. The tree expands and you can browse `public` → Tables.
+   - Authentication: **Identity file** -> select `portal-key.pem`
+6. Save. The server appears on the left; expand
+   `Databases -> postgres -> Schemas -> public -> Tables`.
 
-> On Windows, if pgAdmin rejects the `.pem`: right-click the file → Properties → Security → Advanced → disable inheritance, remove all users except your own.
-
-### Option B — manual tunnel, then a plain connection
-```bash
-ssh -i ulb-portal.pem -L 5433:ulb-portal-db.xxxxx.ap-south-1.rds.amazonaws.com:5432 ubuntu@<ELASTIC_IP> -N
-```
-Leave that terminal open, then in pgAdmin connect to Host `localhost`, Port `5433`, user `ulbadmin`.
-
-### Option C — direct access (only if policy allows)
-1. RDS → Modify → **Public access: Yes**.
-2. In `rds-sg`, add inbound TCP 5432 from **your office public IP /32 only** — never `0.0.0.0/0`.
-3. Connect pgAdmin straight to the RDS endpoint, no tunnel.
-
-### Connecting to local PostgreSQL (development)
-Host `localhost`, Port `5432`, user `postgres`, database `ulb_portal`:
-```bash
-createdb ulb_portal
-psql -d ulb_portal -f deploy/00-prereqs.sql
-psql -d ulb_portal -f deploy/schema.sql
-psql -d ulb_portal -f deploy/data.sql
-```
-Then set `DATABASE_URL=postgresql://postgres:<pwd>@localhost:5432/ulb_portal` in your local `.env` and run `bun run dev`.
+This is safe: the database is only reachable through your key, not from the internet.
 
 ---
 
-## Troubleshooting
+## Part 7 - Day-to-day
 
-| Symptom | Cause / fix |
-|---|---|
-| pgAdmin "timeout expired" | Security group doesn't allow 5432 from EC2, or the SSH tunnel isn't running |
-| pgAdmin "no pg_hba.conf entry" | Set SSL mode to `require` (or append `?sslmode=require`) |
-| Domain shows the wrong municipality | Hostname not added in the admin **Domains** tab, or `proxy_set_header Host $host;` missing in Nginx |
-| 502 Bad Gateway | Node process down — `pm2 logs ulb-portal`, then `pm2 restart ulb-portal` |
-| Certbot fails | The domain's A record isn't pointing at the Elastic IP yet — wait for DNS propagation |
-| Uploads fail in the browser | S3 bucket CORS missing the site origin |
+**Publish new changes**
+```bash
+cd ~/municipal-portal
+git pull
+npm install
+npm run build:node
+pm2 restart portal
+```
 
-## Rough monthly cost (ap-south-1)
-EC2 t3.medium ~$30 · RDS db.t3.small ~$25 · storage/S3/backups ~$8 · Elastic IP free while attached → **≈ $60–70/month**
+**See if something is wrong**
+```bash
+pm2 logs portal --lines 50      # website errors
+docker compose -f deploy/docker-compose.yml logs --tail=50   # backend errors
+sudo tail -50 /var/log/nginx/error.log                       # Nginx errors
+```
+
+**Back up the database (do this weekly)**
+```bash
+docker exec portal-db pg_dump -U postgres > ~/backup-$(date +%F).sql
+```
+Copy that file off the server, or upload it to S3:
+`aws s3 cp ~/backup-$(date +%F).sql s3://<your-bucket>/backups/`
+
+**Common problems**
+
+| What you see | What to do |
+|--------------|------------|
+| `502 Bad Gateway` | The website is not running: `pm2 restart portal`, then `pm2 logs portal` |
+| Site loads but no content | Backend down: `docker compose -f deploy/docker-compose.yml up -d` |
+| Wrong municipality shows | Hostname not mapped: Admin -> Domains tab |
+| Cannot log in | Re-run `deploy/03-admins.sql` |
+| Photo upload fails | Check the S3 keys and bucket name in `.env`, then `pm2 restart portal` |
+| Browsing the raw IP shows an error | Normal. Use a domain name. |
+
+**Change a password**
+```bash
+docker exec -it portal-db psql -U postgres -c \
+  "UPDATE auth.users SET encrypted_password = crypt('NEW-PASSWORD', gen_salt('bf')) WHERE email='superadmin@portal.local';"
+```
+
+---
+
+## Files in this folder
+
+| File | What it is |
+|------|------------|
+| `.env.example` | Template for your settings file |
+| `generate-keys.sh` | Prints the secret keys you need |
+| `docker-compose.yml` | Runs PostgreSQL, logins, and file storage |
+| `kong.yml` | Sends backend requests to the right place |
+| `schema.sql` | All the database tables and security rules |
+| `data.sql` | All 21 municipalities and their current content |
+| `03-admins.sql` | Creates the super admin and 21 municipality admins |
+| `04-domains.sql` | Optional: map domains to municipalities via SQL |
+| `00-prereqs.sql` | Only for a plain PostgreSQL setup without the login container |
+| `nginx.conf` | Web server configuration |
+| `NIC-DNS.md` | The sheet to hand to NIC |
