@@ -1,35 +1,60 @@
-# Static IP for the 21 Municipality Portals
+# Production Deployment Package for AWS + PostgreSQL
 
-## The situation
+Goal: everything needed to take this project from Lovable to a live AWS server running PostgreSQL, written so a complete beginner can follow it step by step.
 
-Lovable hosting cannot provide a dedicated static IP. Sites are served from a shared global edge network, and `185.158.133.1` is an anycast address shared by many projects — it is not reserved for this project and must not be given to NIC as "our server IP" for whitelisting or long-term A-record mapping.
+## Key decision: how the backend runs on AWS
 
-A fixed, project-owned public IP requires self-hosting. On AWS that is an **Elastic IP** attached to the EC2 instance running the app.
+The app talks to its backend through a Supabase-style client used in 26 files (auth, row-level security, storage, all the admin CRUD screens). Two ways to run that on AWS:
 
-## What to add
+- **Recommended — self-hosted Supabase on the EC2 server (Docker).** The database *is* PostgreSQL 16; Supabase is just the API, auth and storage layer sitting on top. Zero application code rewrites, all data stays on your server, admin logins and RLS keep working exactly as they do now.
+- Alternative — bare AWS RDS PostgreSQL with no Supabase layer. This means rewriting all 26 data files, replacing auth with custom session cookies, and rebuilding storage on S3. Weeks of work and a much higher chance of bugs.
 
-### 1. Elastic IP section in the deployment guide
-Extend `deploy/README.md` with a dedicated "Static public IP" section:
-- Allocate an Elastic IP in the same region as the EC2 instance
-- Associate it with the instance (survives stop/start and instance replacement)
-- Note that it must be released only when decommissioning, otherwise the IP changes
-- Security group rules: allow 80/443 from anywhere, 22 restricted to admin IPs
+This plan uses the recommended path: **PostgreSQL on the server, via the self-hosted Supabase stack**, with the option to point it at AWS RDS later by changing one connection string.
 
-### 2. NIC handover sheet
-Add `deploy/NIC-DNS.md` — a fill-in sheet to submit for all 21 domains:
-- One table with columns: municipality, domain, record type, host, value
-- Every domain gets `A @ -> <ELASTIC_IP>` and `A www -> <ELASTIC_IP>`
-- A single placeholder `<ELASTIC_IP>` to substitute once AWS allocates it
-- Note that the same IP serves all 21 domains; the app routes by hostname
+## What gets built
 
-### 3. Nginx multi-domain confirmation
-Verify and document in the guide that the Nginx server block accepts all 42 hostnames and forwards the original `Host` header, so the existing hostname routing in `src/lib/host.functions.ts` resolves the right municipality.
+### 1. Node.js production build (code change)
+The project currently builds for Cloudflare's edge runtime, which cannot run on EC2.
+- Switch the Vite build target to the Node server preset and remove the Cloudflare plugin/`wrangler.jsonc` from the production path
+- Add `npm run start` that boots the built Node server on port 3000
+- Confirm the build output runs locally before touching AWS
 
-### 4. Certbot command for all domains
-Add the ready-to-paste Certbot command covering all 42 hostnames on one certificate, plus the renewal cron note.
+### 2. Environment configuration
+- `deploy/.env.example` listing every variable with plain-English notes: database URL, Supabase URL and keys, Google Maps key, session secret
+- Clear marking of which values are safe to share and which are secret
 
-## Technical notes
+### 3. Docker Compose backend
+- `deploy/docker-compose.yml` running PostgreSQL 16, Supabase auth/API/storage, and an S3-compatible storage target
+- Storage configured to use **AWS S3** for uploaded photos (hero images, member photos, gallery), with a local-disk fallback for testing
 
-- No application code changes are needed. Hostname-to-municipality mapping already exists via the `domains` table and the Super Admin "Domains" tab.
-- Elastic IP is free while attached to a running instance; AWS charges hourly when allocated but unattached.
-- If high availability is later required, the static entry point becomes a Network Load Balancer with Elastic IPs per availability zone — same DNS story for NIC.
+### 4. Database setup
+The three SQL files already exist and stay as-is, loaded in order:
+1. `deploy/00-prereqs.sql` — roles and `auth.uid()`
+2. `deploy/schema.sql` — tables, functions, RLS policies
+3. `deploy/data.sql` — all 21 municipalities and their current content
+Plus a script that recreates the super admin and the 21 municipality admin logins.
+
+### 5. Nginx + HTTPS
+- `deploy/nginx.conf` accepting all 21 municipality domains plus their `www` versions, forwarding the original `Host` header so hostname routing picks the right municipality
+- Certbot command covering every hostname on one certificate, with auto-renewal
+
+### 6. Static IP and DNS for NIC
+- Elastic IP allocation and attachment steps (one fixed public IP for all 21 sites)
+- `deploy/NIC-DNS.md` — a fill-in table: every domain, `A @` and `A www`, all pointing at the same Elastic IP
+
+### 7. The beginner guide
+`deploy/README.md` rewritten as a numbered, no-assumptions walkthrough:
+- Part 1: run it on your own laptop first (install Node, install Docker, load the database, open the site)
+- Part 2: put the code on GitHub
+- Part 3: create the AWS account pieces — EC2 instance, Elastic IP, S3 bucket, security group — with exactly which buttons to click
+- Part 4: copy the code up, run the backend, start the app with PM2 so it restarts on reboot
+- Part 5: Nginx, domains, HTTPS
+- Part 6: connect pgAdmin from your own computer through an SSH tunnel
+- Part 7: how to update the site later, take backups, and what to check when something breaks
+Every step states what you should see when it worked, and what to do if you see an error instead.
+
+## Notes
+
+- No changes to any page, design, or admin screen — this is packaging and configuration only.
+- Suggested server size: 4 vCPU / 8 GB RAM Ubuntu 24.04, which comfortably handles 21 low-traffic municipal sites.
+- The hostname-to-municipality mapping and the Super Admin "Domains" tab already exist and need no changes.
