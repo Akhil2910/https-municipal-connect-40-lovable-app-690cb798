@@ -343,7 +343,7 @@ Copy that file off the server, or upload it to S3:
 | `502 Bad Gateway` | The website is not running: `pm2 restart portal`, then `pm2 logs portal` |
 | Site loads but no content | Backend down: `docker compose -f deploy/docker-compose.yml up -d` |
 | Wrong municipality shows | Hostname not mapped: Admin -> Domains tab |
-| Cannot log in | Re-run `deploy/03-admins.sql` |
+| Login returns `400 Bad Request` | Follow **Repair a 400 login error** below; this normally means the AWS user/password row is missing or stale |
 | Photo upload fails | Check the S3 keys and bucket name in `.env`, then `pm2 restart portal` |
 | Browsing the raw IP shows an error | Normal. Use a domain name. |
 
@@ -352,6 +352,44 @@ Copy that file off the server, or upload it to S3:
 docker exec -it portal-db psql -U postgres -c \
   "UPDATE auth.users SET encrypted_password = crypt('NEW-PASSWORD', gen_salt('bf')) WHERE email='superadmin@portal.local';"
 ```
+
+### Repair a 400 login error
+
+A `POST /auth/v1/token?grant_type=password` response with status 400 means the
+browser reached the login service successfully, but that service rejected the
+credentials. On the EC2 server, from the project directory, run:
+
+```bash
+# 1. Confirm all backend containers are healthy/running.
+docker compose -f deploy/docker-compose.yml --env-file .env ps
+
+# 2. Re-run the idempotent account script. It now also resets stale passwords.
+docker exec -i portal-db psql -v ON_ERROR_STOP=1 -U postgres < deploy/03-admins.sql
+
+# 3. Restart login and gateway services after the database repair.
+docker compose -f deploy/docker-compose.yml --env-file .env restart auth kong
+
+# 4. Inspect the login service if the request still returns 400.
+docker compose -f deploy/docker-compose.yml --env-file .env logs --tail=100 auth
+```
+
+In step 2, the final table must show `email_confirmed = t` and
+`password_set = t` for `superadmin@portal.local`. Then sign in with the full
+email `superadmin@portal.local` and password `superadmin@321` (not only the word
+`superadmin`).
+
+Also make sure the values used to build the website point to this same AWS
+backend. Because Vite embeds `VITE_SUPABASE_URL` at build time, changing `.env`
+requires a new build:
+
+```bash
+grep -E '^(VITE_SUPABASE_URL|SUPABASE_URL)=' .env
+npm run build:node
+pm2 restart portal
+```
+
+Both URLs must identify the same backend. Use `https://api.<your-domain>` after
+HTTPS is configured; while testing only by IP, use `http://<ELASTIC-IP>:8000`.
 
 ---
 

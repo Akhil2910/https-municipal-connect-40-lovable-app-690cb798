@@ -43,6 +43,14 @@ WHERE NOT EXISTS (
     WHERE email='superadmin@portal.local'
 );
 
+-- This file is safe to run again. If the account already existed, repair its
+-- password and confirmation state instead of leaving an old/broken password.
+UPDATE auth.users
+SET encrypted_password = crypt('superadmin@321', gen_salt('bf')),
+    email_confirmed_at = COALESCE(email_confirmed_at, now()),
+    updated_at = now()
+WHERE lower(email) = 'superadmin@portal.local';
+
 INSERT INTO public.user_roles (user_id, role)
 SELECT
     id,
@@ -97,6 +105,19 @@ WHERE NOT EXISTS (
         lower(replace(u.slug,'-','')) || 'admin@portal.local'
 );
 
+-- Repair/reset every existing municipality login as well. The previous
+-- INSERT-only version did not change a password when the user already existed.
+UPDATE auth.users au
+SET encrypted_password = crypt(
+        lower(replace(u.slug, '-', '')) || '@123',
+        gen_salt('bf')
+    ),
+    email_confirmed_at = COALESCE(au.email_confirmed_at, now()),
+    updated_at = now()
+FROM public.ulbs u
+WHERE lower(au.email) =
+    lower(replace(u.slug, '-', '')) || 'admin@portal.local';
+
 -- ============================================================
 -- ASSIGN ADMIN ROLE
 -- ============================================================
@@ -138,10 +159,14 @@ DO NOTHING;
 
 SELECT
     u.email,
-    r.role
+    r.role,
+    u.email_confirmed_at IS NOT NULL AS email_confirmed,
+    u.encrypted_password IS NOT NULL AS password_set
 FROM auth.users u
 LEFT JOIN public.user_roles r
 ON r.user_id=u.id
+WHERE u.email = 'superadmin@portal.local'
+   OR u.email LIKE '%admin@portal.local'
 ORDER BY
     r.role,
     u.email;
