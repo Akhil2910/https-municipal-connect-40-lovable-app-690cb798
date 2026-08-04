@@ -19,11 +19,32 @@ SET client_min_messages = warning;
 SET escape_string_warning = off;
 SET row_security = off;
 
---
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
+-- Self-hosted prerequisites. GoTrue creates auth.users; this file never writes
+-- to GoTrue-managed auth tables.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-CREATE SCHEMA public;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+    CREATE ROLE anon NOLOGIN;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+    CREATE ROLE authenticated NOLOGIN;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'service_role') THEN
+    CREATE ROLE service_role NOLOGIN BYPASSRLS;
+  END IF;
+END $$;
+
+CREATE SCHEMA IF NOT EXISTS public;
+
+CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid
+LANGUAGE sql STABLE
+SET search_path = ''
+AS $$
+  SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid
+$$;
+
+GRANT USAGE ON SCHEMA public, auth TO anon, authenticated, service_role;
 
 
 --
@@ -1268,6 +1289,21 @@ ALTER TABLE public.ulbs ENABLE ROW LEVEL SECURITY;
 --
 
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+
+-- Data API privileges. RLS policies above remain the authorization boundary.
+-- Public reads and grievance submission require anon access; authenticated
+-- users receive CRUD privileges constrained by their role/ULB policies.
+GRANT SELECT ON public.banners, public.co_option_members,
+  public.council_members, public.departments, public.domains, public.gallery,
+  public.leadership, public.news, public.notices, public.pages,
+  public.public_representatives, public.services_info, public.tenders,
+  public.ulbs TO anon;
+GRANT INSERT ON public.grievances TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO service_role;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO service_role;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated, service_role;
 
 --
 -- PostgreSQL database dump complete

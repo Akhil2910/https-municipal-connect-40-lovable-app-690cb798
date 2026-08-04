@@ -1,0 +1,68 @@
+#!/usr/bin/env node
+import { execFileSync } from 'node:child_process'
+
+for (const name of ['SUPABASE_URL', 'SUPABASE_PUBLISHABLE_KEY']) {
+  if (!process.env[name]) throw new Error(`Missing required environment variable: ${name}`)
+}
+
+const baseUrl = process.env.SUPABASE_URL.replace(/\/$/, '')
+const publicKey = process.env.SUPABASE_PUBLISHABLE_KEY
+
+function sql(query) {
+  return execFileSync(
+    'docker',
+    ['exec', 'portal-db', 'psql', '-U', 'postgres', '-d', 'postgres', '-At', '-c', query],
+    { encoding: 'utf8' },
+  ).trim()
+}
+
+async function login(email, password) {
+  const response = await fetch(`${baseUrl}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { apikey: publicKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+  const body = await response.json().catch(() => ({}))
+  if (!response.ok || !body.access_token) {
+    throw new Error(`Login failed for ${email} (${response.status}): ${body.msg ?? body.error_description ?? body.error ?? 'unknown error'}`)
+  }
+}
+
+function check(label, condition, details) {
+  if (!condition) throw new Error(`${label}: ${details}`)
+  console.log(`✓ ${label}`)
+}
+
+async function main() {
+  const counts = sql(`
+    SELECT
+      (SELECT count(*) FROM public.ulbs),
+      (SELECT count(*) FROM auth.users WHERE lower(email) = 'superadmin@portal.local'),
+      (SELECT count(*) FROM auth.users au JOIN public.ulbs u ON lower(au.email) = lower(replace(u.slug, '-', '')) || 'admin@portal.local'),
+      (SELECT count(*) FROM public.user_roles WHERE role = 'super_admin'),
+      (SELECT count(*) FROM public.user_roles WHERE role = 'admin'),
+      (SELECT count(*) FROM public.ulb_admins);
+  `).split('|').map(Number)
+  const [ulbs, superUsers, municipalUsers, superRoles, adminRoles, mappings] = counts
+
+  check('Super Admin exists', superUsers === 1, `expected 1, found ${superUsers}`)
+  check('Municipality Admins exist', municipalUsers === ulbs, `expected ${ulbs}, found ${municipalUsers}`)
+  check('Super Admin role exists', superRoles >= 1, `found ${superRoles}`)
+  check('Municipality Admin roles exist', adminRoles >= ulbs, `expected at least ${ulbs}, found ${adminRoles}`)
+  check('ULB mappings exist', mappings >= ulbs, `expected at least ${ulbs}, found ${mappings}`)
+
+  await login('superadmin@portal.local', 'superadmin@321')
+  console.log('✓ Super Admin login succeeds')
+  await login('muluguadmin@portal.local', 'mulugu@123')
+  console.log('✓ Mulugu Admin login succeeds')
+
+  const allAdminLogins = sql("SELECT lower(replace(slug, '-', '')) FROM public.ulbs ORDER BY slug").split('\n').filter(Boolean)
+  for (const slug of allAdminLogins) await login(`${slug}admin@portal.local`, `${slug}@123`)
+  console.log(`✓ All ${allAdminLogins.length} municipality logins succeed`)
+  console.log('Deployment verification passed.')
+}
+
+main().catch((error) => {
+  console.error(`Deployment verification failed: ${error.message}`)
+  process.exitCode = 1
+})
