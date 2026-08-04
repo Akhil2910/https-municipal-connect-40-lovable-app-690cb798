@@ -11,6 +11,11 @@ No deployment SQL inserts into `auth.users` or `auth.identities`, and no SQL
 hashes passwords. SQL is limited to the application schema, municipality data,
 roles, mappings and permissions.
 
+The deployment uses a current GoTrue release. Its official startup migrations
+normalize legacy nullable auth token columns before the cleanup utility calls
+the Admin API. The utility itself only performs a read-only diagnostic query;
+it never updates or deletes auth rows with SQL.
+
 Deployment order:
 
 ```text
