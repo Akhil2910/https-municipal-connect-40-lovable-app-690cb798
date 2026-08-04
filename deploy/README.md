@@ -11,12 +11,18 @@ No deployment SQL inserts into `auth.users` or `auth.identities`, and no SQL
 hashes passwords. SQL is limited to the application schema, municipality data,
 roles, mappings and permissions.
 
+The deployment uses a current GoTrue release. Its official startup migrations
+normalize legacy nullable auth token columns before the cleanup utility calls
+the Admin API. The utility itself only performs a read-only diagnostic query;
+it never updates or deletes auth rows with SQL.
+
 Deployment order:
 
 ```text
 docker compose up
   -> deploy/01-schema.sql
   -> deploy/02-seed.sql
+  -> deploy/migrate-legacy-users.mjs (supported GoTrue Admin API cleanup)
   -> deploy/create-users.mjs (GoTrue Admin API)
   -> deploy/03-roles.sql
   -> deploy/verify-deployment.mjs
@@ -87,8 +93,8 @@ npm run deploy:backend
 On a fresh database this creates the schema and loads all existing
 municipality, gallery, department, notice, tender, council, chairperson, media
 and public representative data. On an initialized database it preserves current
-data, skips existing users, creates only missing users, re-applies missing
-roles/mappings, and verifies every login.
+data, migrates incompatible users left by the retired SQL provisioning script,
+creates only missing users, re-applies roles/mappings, and verifies every login.
 
 Expected final output includes:
 
@@ -117,6 +123,7 @@ Existing accounts are never duplicated or overwritten. To provision missing
 accounts only:
 
 ```bash
+npm run deploy:migrate-users
 npm run deploy:users
 npm run deploy:roles
 npm run deploy:verify
@@ -130,6 +137,7 @@ Use this only when diagnosing an individual step:
 docker compose -f deploy/docker-compose.yml --env-file .env up -d
 docker exec -i portal-db psql -v ON_ERROR_STOP=1 -U postgres -d postgres < deploy/01-schema.sql
 docker exec -i portal-db psql -v ON_ERROR_STOP=1 -U postgres -d postgres < deploy/02-seed.sql
+npm run deploy:migrate-users
 npm run deploy:users
 npm run deploy:roles
 npm run deploy:verify
@@ -210,8 +218,11 @@ npm run build:node
 pm2 restart portal
 ```
 
-The backend deployment preserves initialized content and only repairs missing
-auth users, roles or mappings.
+The backend deployment preserves initialized content. It detects legacy
+SQL-created auth rows, removes only those users through GoTrue's Admin API,
+recreates them through that same API, and then restores roles and ULB mappings.
+Municipality, gallery, notice, department, and all other website tables are
+never deleted or reseeded during an update.
 
 ## 10. Verification and troubleshooting
 
@@ -229,17 +240,21 @@ docker compose -f deploy/docker-compose.yml --env-file .env logs --tail=100 auth
 pm2 logs portal --lines 100
 ```
 
-If login returns 400, do not insert or update auth tables with SQL. Run:
+If login returns 400, do not insert or update auth tables with SQL. Back up the
+database first, then run:
 
 ```bash
+npm run deploy:migrate-users
 npm run deploy:users
 npm run deploy:roles
 npm run deploy:verify
 ```
 
-If a user already exists with an unknown password, this utility intentionally
-does not overwrite it. Update or recreate that user through a supported GoTrue
-Admin API operation, then rerun verification.
+The migration is idempotent: when no incompatible rows exist it prints a message
+and continues. It never updates or deletes `auth.users` with SQL. SQL is used
+read-only to identify malformed legacy rows; deletion and recreation use the
+supported GoTrue Admin API. `03-roles.sql` restores `user_roles` and
+`ulb_admins` against the recreated user IDs.
 
 If `.env` API URLs change, rebuild because Vite embeds the browser URL:
 
@@ -278,6 +293,7 @@ Do not delete `db-data` or `storage-data` during a normal code rollback.
 |---|---|
 | `01-schema.sql` | Application tables, functions, RLS and permissions |
 | `02-seed.sql` | All existing municipality and website content |
+| `migrate-legacy-users.mjs` | Detects malformed legacy users and deletes them through GoTrue |
 | `create-users.mjs` | Idempotent GoTrue Admin API user provisioning |
 | `03-roles.sql` | Idempotent application roles and ULB mappings |
 | `verify-deployment.mjs` | Database, role, mapping and real login checks |

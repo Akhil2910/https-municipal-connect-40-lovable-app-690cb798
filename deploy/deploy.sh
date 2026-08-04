@@ -24,6 +24,15 @@ for attempt in $(seq 1 60); do
   sleep 2
 done
 
+# GoTrue's own startup migrations normalize legacy nullable token columns before
+# this script asks the Admin API to delete and recreate incompatible users.
+docker compose -f deploy/docker-compose.yml --env-file .env restart auth
+for attempt in $(seq 1 60); do
+  if curl --silent --fail "http://localhost:8000/auth/v1/health" >/dev/null 2>&1; then break; fi
+  if [[ "$attempt" == "60" ]]; then echo "Auth did not restart cleanly." >&2; exit 1; fi
+  sleep 2
+done
+
 if ! docker exec portal-db psql -U postgres -d postgres -Atqc "SELECT to_regclass('public.ulbs') IS NOT NULL" | grep -qx t; then
   docker exec -i portal-db psql -v ON_ERROR_STOP=1 -U postgres -d postgres < deploy/01-schema.sql
   docker exec -i portal-db psql -v ON_ERROR_STOP=1 -U postgres -d postgres < deploy/02-seed.sql
@@ -31,6 +40,7 @@ else
   echo "Schema and municipality data already exist; preserving current data."
 fi
 
+SUPABASE_URL=http://localhost:8000 node --env-file=.env deploy/migrate-legacy-users.mjs
 SUPABASE_URL=http://localhost:8000 node --env-file=.env deploy/create-users.mjs
 docker exec -i portal-db psql -v ON_ERROR_STOP=1 -U postgres -d postgres < deploy/03-roles.sql
 SUPABASE_URL=http://localhost:8000 node --env-file=.env deploy/verify-deployment.mjs

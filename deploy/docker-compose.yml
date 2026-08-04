@@ -19,7 +19,7 @@ services:
       retries: 20
 
   auth:
-    image: supabase/gotrue:v2.158.1
+    image: supabase/gotrue:v2.195.0
     container_name: portal-auth
     restart: unless-stopped
     depends_on:

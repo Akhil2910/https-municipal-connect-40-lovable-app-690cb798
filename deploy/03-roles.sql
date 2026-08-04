@@ -1,47 +1,14 @@
 -- ============================================================
--- 03-admins.sql
--- Creates Super Admin and Municipality Admin accounts
+-- 03-roles.sql
+-- Restores application roles and municipality mappings after GoTrue creates users.
 -- Run AFTER:
 --   schema.sql
 --   data.sql
 -- ============================================================
 
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
 -- ============================================================
 -- SUPER ADMIN
 -- ============================================================
-
-INSERT INTO auth.users (
-    instance_id,
-    id,
-    aud,
-    role,
-    email,
-    encrypted_password,
-    email_confirmed_at,
-    created_at,
-    updated_at,
-    raw_app_meta_data,
-    raw_user_meta_data
-)
-SELECT
-    '00000000-0000-0000-0000-000000000000',
-    gen_random_uuid(),
-    'authenticated',
-    'authenticated',
-    'superadmin@portal.local',
-    crypt('superadmin@321', gen_salt('bf')),
-    now(),
-    now(),
-    now(),
-    '{"provider":"email","providers":["email"]}',
-    '{}'
-WHERE NOT EXISTS (
-    SELECT 1
-    FROM auth.users
-    WHERE email='superadmin@portal.local'
-);
 
 INSERT INTO public.user_roles (user_id, role)
 SELECT
@@ -50,52 +17,6 @@ SELECT
 FROM auth.users
 WHERE email='superadmin@portal.local'
 ON CONFLICT (user_id, role) DO NOTHING;
-
--- ============================================================
--- CREATE ONE LOGIN FOR EVERY MUNICIPALITY
--- ============================================================
-
-INSERT INTO auth.users (
-    instance_id,
-    id,
-    aud,
-    role,
-    email,
-    encrypted_password,
-    email_confirmed_at,
-    created_at,
-    updated_at,
-    raw_app_meta_data,
-    raw_user_meta_data
-)
-SELECT
-    '00000000-0000-0000-0000-000000000000',
-    gen_random_uuid(),
-    'authenticated',
-    'authenticated',
-
-    lower(replace(u.slug,'-','')) || 'admin@portal.local',
-
-    crypt(
-        lower(replace(u.slug,'-','')) || '@123',
-        gen_salt('bf')
-    ),
-
-    now(),
-    now(),
-    now(),
-
-    '{"provider":"email","providers":["email"]}',
-    '{}'
-
-FROM public.ulbs u
-
-WHERE NOT EXISTS (
-    SELECT 1
-    FROM auth.users au
-    WHERE au.email =
-        lower(replace(u.slug,'-','')) || 'admin@portal.local'
-);
 
 -- ============================================================
 -- ASSIGN ADMIN ROLE
