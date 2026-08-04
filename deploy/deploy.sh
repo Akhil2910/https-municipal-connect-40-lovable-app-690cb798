@@ -9,17 +9,12 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
-set -a
-# shellcheck disable=SC1091
-source .env
-set +a
-
 docker compose -f deploy/docker-compose.yml --env-file .env up -d
 
 echo "Waiting for PostgreSQL and GoTrue..."
 for attempt in $(seq 1 60); do
   if docker exec portal-db pg_isready -U postgres >/dev/null 2>&1 && \
-     curl --silent --fail "${SUPABASE_URL%/}/auth/v1/health" >/dev/null 2>&1; then
+     curl --silent --fail "http://localhost:8000/auth/v1/health" >/dev/null 2>&1; then
     break
   fi
   if [[ "$attempt" == "60" ]]; then
@@ -36,6 +31,6 @@ else
   echo "Schema and municipality data already exist; preserving current data."
 fi
 
-node deploy/create-users.mjs
+node --env-file=.env deploy/create-users.mjs
 docker exec -i portal-db psql -v ON_ERROR_STOP=1 -U postgres -d postgres < deploy/03-roles.sql
-node deploy/verify-deployment.mjs
+node --env-file=.env deploy/verify-deployment.mjs
