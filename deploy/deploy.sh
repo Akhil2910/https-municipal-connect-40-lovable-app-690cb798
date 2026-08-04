@@ -31,6 +31,6 @@ else
   echo "Schema and municipality data already exist; preserving current data."
 fi
 
-node --env-file=.env deploy/create-users.mjs
+SUPABASE_URL=http://localhost:8000 node --env-file=.env deploy/create-users.mjs
 docker exec -i portal-db psql -v ON_ERROR_STOP=1 -U postgres -d postgres < deploy/03-roles.sql
-node --env-file=.env deploy/verify-deployment.mjs
+SUPABASE_URL=http://localhost:8000 node --env-file=.env deploy/verify-deployment.mjs
