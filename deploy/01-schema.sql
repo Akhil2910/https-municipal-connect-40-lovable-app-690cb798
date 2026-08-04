@@ -1293,10 +1293,15 @@ ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 -- Data API privileges. RLS policies above remain the authorization boundary.
 -- Public reads and grievance submission require anon access; authenticated
 -- users receive CRUD privileges constrained by their role/ULB policies.
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO anon;
+GRANT SELECT ON public.banners, public.co_option_members,
+  public.council_members, public.departments, public.domains, public.gallery,
+  public.leadership, public.news, public.notices, public.pages,
+  public.public_representatives, public.services_info, public.tenders,
+  public.ulbs TO anon;
+GRANT INSERT ON public.grievances TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO service_role;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO service_role;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated, service_role;
 
