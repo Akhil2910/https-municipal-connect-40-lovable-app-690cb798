@@ -1,33 +1,147 @@
--- Assign application authorization after deploy/create-users.mjs has created
--- accounts through GoTrue's supported Admin API. This file never modifies
--- GoTrue-managed auth records.
+-- ============================================================
+-- 03-admins.sql
+-- Creates Super Admin and Municipality Admin accounts
+-- Run AFTER:
+--   schema.sql
+--   data.sql
+-- ============================================================
 
-BEGIN;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- ============================================================
+-- SUPER ADMIN
+-- ============================================================
+
+INSERT INTO auth.users (
+    instance_id,
+    id,
+    aud,
+    role,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    created_at,
+    updated_at,
+    raw_app_meta_data,
+    raw_user_meta_data
+)
+SELECT
+    '00000000-0000-0000-0000-000000000000',
+    gen_random_uuid(),
+    'authenticated',
+    'authenticated',
+    'superadmin@portal.local',
+    crypt('superadmin@321', gen_salt('bf')),
+    now(),
+    now(),
+    now(),
+    '{"provider":"email","providers":["email"]}',
+    '{}'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM auth.users
+    WHERE email='superadmin@portal.local'
+);
 
 INSERT INTO public.user_roles (user_id, role)
-SELECT id, 'super_admin'::public.app_role
+SELECT
+    id,
+    'super_admin'::public.app_role
 FROM auth.users
-WHERE lower(email) = 'superadmin@portal.local'
+WHERE email='superadmin@portal.local'
 ON CONFLICT (user_id, role) DO NOTHING;
+
+-- ============================================================
+-- CREATE ONE LOGIN FOR EVERY MUNICIPALITY
+-- ============================================================
+
+INSERT INTO auth.users (
+    instance_id,
+    id,
+    aud,
+    role,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    created_at,
+    updated_at,
+    raw_app_meta_data,
+    raw_user_meta_data
+)
+SELECT
+    '00000000-0000-0000-0000-000000000000',
+    gen_random_uuid(),
+    'authenticated',
+    'authenticated',
+
+    lower(replace(u.slug,'-','')) || 'admin@portal.local',
+
+    crypt(
+        lower(replace(u.slug,'-','')) || '@123',
+        gen_salt('bf')
+    ),
+
+    now(),
+    now(),
+    now(),
+
+    '{"provider":"email","providers":["email"]}',
+    '{}'
+
+FROM public.ulbs u
+
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM auth.users au
+    WHERE au.email =
+        lower(replace(u.slug,'-','')) || 'admin@portal.local'
+);
+
+-- ============================================================
+-- ASSIGN ADMIN ROLE
+-- ============================================================
 
 INSERT INTO public.user_roles (user_id, role)
-SELECT au.id, 'admin'::public.app_role
-FROM auth.users AS au
-JOIN public.ulbs AS u
-  ON lower(au.email) = lower(replace(u.slug, '-', '')) || 'admin@portal.local'
+SELECT
+    au.id,
+    'admin'::public.app_role
+FROM auth.users au
+JOIN public.ulbs u
+ON au.email =
+    lower(replace(u.slug,'-','')) || 'admin@portal.local'
 ON CONFLICT (user_id, role) DO NOTHING;
 
-INSERT INTO public.ulb_admins (user_id, ulb_id, label)
-SELECT au.id, u.id, u.name || ' Admin'
-FROM auth.users AS au
-JOIN public.ulbs AS u
-  ON lower(au.email) = lower(replace(u.slug, '-', '')) || 'admin@portal.local'
-ON CONFLICT (user_id, ulb_id) DO UPDATE
-SET label = EXCLUDED.label;
+-- ============================================================
+-- MAP ADMIN TO MUNICIPALITY
+-- ============================================================
 
-COMMIT;
+INSERT INTO public.ulb_admins
+(
+    user_id,
+    ulb_id,
+    label
+)
+SELECT
+    au.id,
+    u.id,
+    u.name || ' Admin'
+FROM auth.users au
+JOIN public.ulbs u
+ON au.email =
+    lower(replace(u.slug,'-','')) || 'admin@portal.local'
+ON CONFLICT (user_id, ulb_id)
+DO NOTHING;
+
+-- ============================================================
+-- VERIFY
+-- ============================================================
 
 SELECT
-  (SELECT count(*) FROM public.user_roles WHERE role = 'super_admin') AS super_admin_roles,
-  (SELECT count(*) FROM public.user_roles WHERE role = 'admin') AS municipality_admin_roles,
-  (SELECT count(*) FROM public.ulb_admins) AS municipality_mappings;
+    u.email,
+    r.role
+FROM auth.users u
+LEFT JOIN public.user_roles r
+ON r.user_id=u.id
+ORDER BY
+    r.role,
+    u.email;
