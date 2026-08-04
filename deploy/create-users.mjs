@@ -63,19 +63,6 @@ async function main() {
   let created = 0
   let skipped = 0
 
-  const legacyBroken = desired
-    .map((account) => account.email)
-    .filter((email) => {
-      const user = users.find((item) => item.email?.toLowerCase() === email)
-      return user && (!Array.isArray(user.identities) || user.identities.length === 0)
-    })
-  if (legacyBroken.length > 0) {
-    throw new Error(
-      `Found ${legacyBroken.length} legacy SQL-created account(s) without GoTrue identities: ${legacyBroken.join(', ')}. ` +
-      'Back up the database, remove those legacy accounts through a supported GoTrue Admin API delete, then rerun this utility.',
-    )
-  }
-
   for (const account of desired) {
     if (existing.has(account.email)) {
       console.log(`SKIP   ${account.email}`)
