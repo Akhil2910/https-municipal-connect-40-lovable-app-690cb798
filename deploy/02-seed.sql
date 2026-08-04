@@ -590,40 +590,8 @@ INSERT INTO public.public_representatives (id, ulb_id, name, designation, consti
 
 
 
---
--- Data for Name: ulb_admins; Type: TABLE DATA; Schema: public; Owner: -
---
-
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('536d488c-d0f9-46bf-a2a0-eff0ff48d317', '7fcb6049-1588-43e2-8a36-564c99e273e8', '232c9fe7-c48c-479c-9676-07f2cdfbf9e4', NULL, '2026-07-30 16:39:15.209919+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('440d9b24-52ae-4398-ac4b-75956790e8e4', 'f9c5b958-f168-4a17-b264-58fef3cb41b9', '8fa22520-6dbb-4350-a961-41dd5127bb46', 'Aliyadbad Admin', '2026-07-30 16:49:20.774698+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('48d60d85-27f1-4f78-9180-94870a49469d', 'f7452a7d-f3f5-4e9c-8c2a-67152249f6ff', '41c532ae-1865-4a36-9604-eca76357e98c', 'Asifabad Admin', '2026-07-30 16:49:21.362299+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('ef469083-4f0c-4848-894e-dc7197db4b49', '90466537-2bba-4ca2-ae3a-1b6b6f488957', '862b38db-af42-4290-9638-3ddef736d469', 'Aswaraopeta Admin', '2026-07-30 16:49:21.944217+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('19b64e2a-66fb-4af7-aba5-1d4ea8f62a57', '52749a66-6ad7-44f7-aefa-8fa68439516d', 'eab23bf4-21c8-4217-86f4-e1be66af8f90', 'Bichkunda Admin', '2026-07-30 16:49:22.530657+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('7386a307-cac5-4e93-9bbd-c282a49b5908', '9083d0e7-add1-492d-8a00-52e3a5d3f6fa', '4e414f3e-0140-412c-b50a-43356d1dfd01', 'Chevella Admin', '2026-07-30 16:49:23.112812+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('f562f643-0fb5-48bd-a4c6-b9d7737987df', 'faa68f1a-24df-44be-8e12-62298d121fbc', '82f7c59a-e4a0-46e7-b2bf-2f98a32bb69a', 'Devarakadara Admin', '2026-07-30 16:49:23.696829+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('002c4619-2154-4929-a751-2622c9f39511', 'c3de9421-1683-41cf-911d-c1c6a78fa2ec', 'fb50e2e0-f6ac-43d9-aa06-13b416e9f9d1', 'Edulapuram Admin', '2026-07-30 16:49:24.320961+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('bf5825f1-968c-486d-bc8e-8fde5e52ae79', 'fd5b0a1e-4255-40b0-ac3c-52028f5eadd0', '291ca644-58d6-474d-9ab2-74655506631e', 'Gaddapotharam Admin', '2026-07-30 16:49:24.901068+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('58b1fa19-dd3d-4736-a02d-ad0b9ebaba0d', 'dbcdd77a-8c89-4047-9ced-2068bb573eed', 'e112a98b-e438-45eb-9f92-eee4768ab87d', 'Gummadidala Admin', '2026-07-30 16:49:25.485923+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('c68f4a6c-466d-4808-bc2f-0c4edac64772', 'e0833ad3-246f-40fe-95e9-bc3b8f034c64', '9f8dbae3-acff-47e1-ba26-1f7f08d05a1d', 'Indresham Admin', '2026-07-30 16:49:26.0672+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('09a9f01a-8204-4c6d-9dd7-af10c6a022ce', 'bf9c4267-7f03-4610-be3b-f7c068b2e68b', '9cb3316d-bdd7-44ed-a312-b6dc4e89bf71', 'Isnapur Admin', '2026-07-30 16:49:26.660951+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('9957181e-301c-46cd-abad-bbc2c0c08f55', '85614c6c-d2ec-4a64-a31a-76b45b24b491', '71a3e077-768a-49be-b99e-6d1fbcd45ec9', 'Jinnaram Admin', '2026-07-30 16:49:27.244824+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('b7d1ea87-9cfd-404f-950b-1dadcad783ee', '058193ba-0ed5-497b-9bbd-66e5b2c6243f', 'd7d0ec2b-1fb7-4c0d-babe-e5fec7173eb5', 'Kalluru Admin', '2026-07-30 16:49:27.827284+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('a4939162-e8b5-4523-9e05-714d89320185', 'd14a08c3-6d40-4292-a40b-1874c87a5815', '3a903c5c-de28-427d-9bd5-fcea16011382', 'Kesamudram Admin', '2026-07-30 16:49:28.410814+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('07c76820-92c7-4175-90bb-e1914cc2db54', 'ffa07234-0ed1-45e9-9e38-025ddf6eae82', '9fe4af6d-5bce-4724-b08f-58257668c239', 'Kohir Admin', '2026-07-30 16:49:29.012509+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('8d8ad679-01e9-4668-8c8d-5429259bed34', 'd65f9b8b-b0c0-46b9-98b6-0984a48135fc', 'a0846369-2983-491a-9630-6eaaaae1b0ec', 'Maddur Admin', '2026-07-30 16:49:29.599297+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('2928fe88-ede8-4b5a-9cb7-f7f512c86c35', '63747470-3c54-413e-8767-0aaf0a216817', 'd7416ee0-4876-42a9-9bd8-699a2ecc7a1c', 'Moinabad Admin', '2026-07-30 16:49:30.180969+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('bea63fef-de8c-49fb-b8a6-7478ff7301b4', '30a7c591-cb48-4b16-82c1-526fe55f1aaa', 'bdabf30a-2077-4cf2-b7e4-6625f06e0d69', 'Muduchinthalapally Admin', '2026-07-30 16:49:30.768834+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('b8a3f108-12d8-4362-8a53-5068233e84fd', 'f5d1cc2e-f5da-43a1-94d7-79f57908a68a', '232c9fe7-c48c-479c-9676-07f2cdfbf9e4', 'Mulugu Admin', '2026-07-30 16:49:31.36119+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('669906ba-54ac-4e3c-a8a2-c4b8d7cabda4', '934963bc-3d07-4d3f-a603-321f61c8e3d7', '4618271a-aaf1-47ee-a486-5c09dbb21853', 'Station Ghanpur Admin', '2026-07-30 16:49:31.952447+00');
-INSERT INTO public.ulb_admins (id, user_id, ulb_id, label, created_at) VALUES ('d5d2d224-c3e3-4bd4-abbc-c9667bf01f7a', '5a7bc3ba-50f2-4d20-9361-776a60821fc9', '238c8c22-348b-4b30-800b-f4011eb96355', 'Yellapet Admin', '2026-07-30 16:49:32.540226+00');
-
-
---
--- Data for Name: user_roles; Type: TABLE DATA; Schema: public; Owner: -
---
-
-INSERT INTO public.user_roles (id, user_id, role, created_at) VALUES ('b73cd8df-7657-4158-8939-e88a09be31d2', 'df3cfd09-2554-42f2-bf7f-1546df332f59', 'super_admin', '2026-05-08 05:43:04.164938+00');
-INSERT INTO public.user_roles (id, user_id, role, created_at) VALUES ('9fd4dade-2fa1-43b7-a767-e93417d8b222', '54d2c69a-e639-4439-8cdc-ee5a20fa0123', 'super_admin', '2026-07-30 16:49:20.166171+00');
+-- Authentication-derived user_roles and ulb_admins are intentionally not
+-- seeded here. deploy/03-roles.sql builds them from GoTrue-created users.
 
 
 --

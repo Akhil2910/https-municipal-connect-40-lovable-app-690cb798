@@ -19,11 +19,32 @@ SET client_min_messages = warning;
 SET escape_string_warning = off;
 SET row_security = off;
 
---
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
+-- Self-hosted prerequisites. GoTrue creates auth.users; this file never writes
+-- to GoTrue-managed auth tables.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-CREATE SCHEMA public;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+    CREATE ROLE anon NOLOGIN;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+    CREATE ROLE authenticated NOLOGIN;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'service_role') THEN
+    CREATE ROLE service_role NOLOGIN BYPASSRLS;
+  END IF;
+END $$;
+
+CREATE SCHEMA IF NOT EXISTS public;
+
+CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid
+LANGUAGE sql STABLE
+SET search_path = ''
+AS $$
+  SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid
+$$;
+
+GRANT USAGE ON SCHEMA public, auth TO anon, authenticated, service_role;
 
 
 --
