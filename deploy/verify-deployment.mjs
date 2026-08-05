@@ -39,23 +39,22 @@ async function main() {
       (SELECT count(*) FROM public.ulbs),
       (SELECT count(*) FROM auth.users WHERE lower(email) = 'superadmin@portal.local'),
       (SELECT count(*) FROM auth.users au JOIN public.ulbs u ON lower(au.email) = lower(replace(u.slug, '-', '')) || 'admin@portal.local'),
-      (SELECT count(*) FROM public.user_roles WHERE role = 'super_admin'),
-      (SELECT count(*) FROM public.user_roles WHERE role = 'admin'),
-      (SELECT count(*) FROM public.ulb_admins);
+      (SELECT count(*) FROM public.user_roles r JOIN auth.users u ON u.id = r.user_id WHERE r.role = 'super_admin' AND lower(u.email) = 'superadmin@portal.local'),
+      (SELECT count(*) FROM public.user_roles r JOIN auth.users au ON au.id = r.user_id JOIN public.ulbs u ON lower(au.email) = lower(replace(u.slug, '-', '')) || 'admin@portal.local' WHERE r.role = 'admin'),
+      (SELECT count(*) FROM public.ulb_admins a JOIN auth.users au ON au.id = a.user_id JOIN public.ulbs u ON u.id = a.ulb_id AND lower(au.email) = lower(replace(u.slug, '-', '')) || 'admin@portal.local'),
+      (SELECT count(*) FROM public.ulb_admins a LEFT JOIN auth.users au ON au.id = a.user_id WHERE au.id IS NULL);
   `).split('|').map(Number)
-  const [ulbs, superUsers, municipalUsers, superRoles, adminRoles, mappings] = counts
+  const [ulbs, superUsers, municipalUsers, superRoles, adminRoles, mappings, orphanMappings] = counts
 
   check('Super Admin exists', superUsers === 1, `expected 1, found ${superUsers}`)
   check('Municipality Admins exist', municipalUsers === ulbs, `expected ${ulbs}, found ${municipalUsers}`)
-  check('Super Admin role exists', superRoles >= 1, `found ${superRoles}`)
-  check('Municipality Admin roles exist', adminRoles >= ulbs, `expected at least ${ulbs}, found ${adminRoles}`)
-  check('ULB mappings exist', mappings >= ulbs, `expected at least ${ulbs}, found ${mappings}`)
+  check('Super Admin role exists', superRoles === 1, `expected 1, found ${superRoles}`)
+  check('Municipality Admin roles exist', adminRoles === ulbs, `expected ${ulbs}, found ${adminRoles}`)
+  check('ULB mappings exist', mappings === ulbs, `expected ${ulbs}, found ${mappings}`)
+  check('No orphan ULB mappings exist', orphanMappings === 0, `found ${orphanMappings}`)
 
   await login('superadmin@portal.local', 'superadmin@321')
   console.log('✓ Super Admin login succeeds')
-  await login('muluguadmin@portal.local', 'mulugu@123')
-  console.log('✓ Mulugu Admin login succeeds')
-
   const allAdminLogins = sql("SELECT lower(replace(slug, '-', '')) FROM public.ulbs ORDER BY slug").split('\n').filter(Boolean)
   for (const slug of allAdminLogins) await login(`${slug}admin@portal.local`, `${slug}@123`)
   console.log(`✓ All ${allAdminLogins.length} municipality logins succeed`)

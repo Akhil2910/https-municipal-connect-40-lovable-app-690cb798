@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process'
 
-const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'POSTGRES_PASSWORD']
+const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']
 for (const name of required) {
   if (!process.env[name]) throw new Error(`Missing required environment variable: ${name}`)
 }
@@ -46,6 +46,47 @@ function readLegacyUsers() {
   })
 }
 
+function prepareMigration(legacyUsers) {
+  const ids = legacyUsers.map(({ id }) => `'${id}'::uuid`).join(', ')
+  sql(`
+    CREATE TABLE IF NOT EXISTS public._deployment_auth_migration_backup (
+      old_user_id uuid NOT NULL,
+      email text NOT NULL,
+      role text,
+      ulb_id uuid,
+      label text,
+      PRIMARY KEY (old_user_id, role, ulb_id)
+    );
+
+    INSERT INTO public._deployment_auth_migration_backup
+      (old_user_id, email, role, ulb_id, label)
+    SELECT
+      u.id,
+      lower(u.email),
+      r.role::text,
+      a.ulb_id,
+      a.label
+    FROM auth.users u
+    LEFT JOIN public.user_roles r ON r.user_id = u.id
+    LEFT JOIN public.ulb_admins a ON a.user_id = u.id
+    WHERE u.id IN (${ids})
+    ON CONFLICT (old_user_id, role, ulb_id) DO UPDATE
+      SET email = EXCLUDED.email,
+          label = EXCLUDED.label;
+
+    UPDATE auth.users
+    SET confirmation_token = COALESCE(confirmation_token, ''),
+        recovery_token = COALESCE(recovery_token, ''),
+        email_change_token_current = COALESCE(email_change_token_current, ''),
+        email_change_token_new = COALESCE(email_change_token_new, ''),
+        email_change = COALESCE(email_change, ''),
+        phone_change_token = COALESCE(phone_change_token, ''),
+        phone_change = COALESCE(phone_change, ''),
+        reauthentication_token = COALESCE(reauthentication_token, '')
+    WHERE id IN (${ids});
+  `)
+}
+
 async function deleteUser(id) {
   const response = await fetch(`${baseUrl}/auth/v1/admin/users/${encodeURIComponent(id)}`, {
     method: 'DELETE',
@@ -67,14 +108,15 @@ async function main() {
   }
 
   console.log(`Legacy auth migration: found ${legacyUsers.length} incompatible user(s).`)
-  console.log('Public role and municipality mappings will be restored by deploy/03-roles.sql after recreation.')
+  console.log('Saving role/mapping assignments and applying the GoTrue nullable-token compatibility repair.')
+  prepareMigration(legacyUsers)
 
   for (const user of legacyUsers) {
     await deleteUser(user.id)
     console.log(`DELETE ${user.email} (GoTrue Admin API)`)
   }
 
-  console.log('Legacy auth migration complete. User provisioning can now recreate the accounts safely.')
+  console.log('Legacy auth migration complete. Users can now be recreated through the GoTrue Admin API.')
 }
 
 main().catch((error) => {
