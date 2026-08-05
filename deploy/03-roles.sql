@@ -15,11 +15,7 @@ CREATE TABLE IF NOT EXISTS deployment.auth_migration_backup (
     label text
 );
 
--- Remove mappings that point at IDs retired by the legacy-user migration.
-DELETE FROM public.ulb_admins a
-USING deployment.auth_migration_backup b
-WHERE a.user_id = b.old_user_id;
-
+-- Remove role assignments that point at IDs retired by the legacy-user migration.
 DELETE FROM public.user_roles r
 USING deployment.auth_migration_backup b
 WHERE r.user_id = b.old_user_id;
@@ -97,6 +93,49 @@ ON r.user_id=u.id
 ORDER BY
     r.role,
     u.email;
+
+-- Repair administrator mappings that still reference retired GoTrue IDs.
+-- First copy each orphaned mapping to the recreated user matched by the email
+-- captured in deployment.auth_migration_backup. ON CONFLICT keeps this safe
+-- when the restored mapping was already inserted above.
+INSERT INTO public.ulb_admins (user_id, ulb_id, label)
+SELECT DISTINCT
+    au.id,
+    a.ulb_id,
+    COALESCE(a.label, b.label)
+FROM public.ulb_admins a
+JOIN deployment.auth_migration_backup b
+  ON b.old_user_id = a.user_id
+JOIN auth.users au
+  ON lower(au.email) = lower(b.email)
+LEFT JOIN auth.users existing_user
+  ON existing_user.id = a.user_id
+WHERE existing_user.id IS NULL
+ON CONFLICT (user_id, ulb_id)
+DO UPDATE SET label = COALESCE(EXCLUDED.label, public.ulb_admins.label);
+
+-- The matching mappings now exist under their recreated user IDs. Remove the
+-- retired rows, plus any orphan that has no backup/email match and therefore
+-- cannot possibly satisfy the auth.users foreign key.
+DELETE FROM public.ulb_admins a
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM auth.users u
+    WHERE u.id = a.user_id
+);
+
+-- Refuse to create the constraint unless orphan cleanup is complete.
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM public.ulb_admins a
+        LEFT JOIN auth.users u ON u.id = a.user_id
+        WHERE u.id IS NULL
+    ) THEN
+        RAISE EXCEPTION 'Cannot add ulb_admins_user_id_fkey: orphan administrator mappings remain';
+    END IF;
+END $$;
 
 -- Existing installations did not always include this relationship. Add it
 -- only after old IDs have been remapped to the recreated GoTrue users.
