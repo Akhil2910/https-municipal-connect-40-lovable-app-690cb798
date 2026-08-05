@@ -23,28 +23,43 @@ function sql(query) {
 }
 
 function readLegacyUsers() {
+  sql(`
+    CREATE SCHEMA IF NOT EXISTS deployment;
+    CREATE TABLE IF NOT EXISTS deployment.auth_migration_backup (
+      old_user_id uuid NOT NULL,
+      email text NOT NULL,
+      role text,
+      ulb_id uuid,
+      label text
+    );
+  `)
   const output = sql(`
     SELECT id::text, lower(email)
-    FROM auth.users
-    WHERE email IS NOT NULL
+    FROM auth.users u
+    WHERE u.email IS NOT NULL
       AND (
-        lower(email) = 'superadmin@portal.local'
-        OR lower(email) IN (
+        lower(u.email) = 'superadmin@portal.local'
+        OR lower(u.email) IN (
           SELECT lower(replace(slug, '-', '')) || 'admin@portal.local'
           FROM public.ulbs
         )
       )
       AND (
-        confirmation_token IS NULL
-        OR recovery_token IS NULL
-        OR email_change_token_current IS NULL
-        OR email_change_token_new IS NULL
-        OR email_change IS NULL
-        OR phone_change_token IS NULL
-        OR phone_change IS NULL
-        OR reauthentication_token IS NULL
+        u.confirmation_token IS NULL
+        OR u.recovery_token IS NULL
+        OR u.email_change_token_current IS NULL
+        OR u.email_change_token_new IS NULL
+        OR u.email_change IS NULL
+        OR u.phone_change_token IS NULL
+        OR u.phone_change IS NULL
+        OR u.reauthentication_token IS NULL
+        OR EXISTS (
+          SELECT 1
+          FROM deployment.auth_migration_backup b
+          WHERE b.old_user_id = u.id
+        )
       )
-    ORDER BY email;
+    ORDER BY u.email;
   `)
   if (!output) return []
   return output.split('\n').map((line) => {
@@ -56,15 +71,6 @@ function readLegacyUsers() {
 function prepareMigration(legacyUsers) {
   const ids = legacyUsers.map(({ id }) => `'${id}'::uuid`).join(', ')
   sql(`
-    CREATE SCHEMA IF NOT EXISTS deployment;
-    CREATE TABLE IF NOT EXISTS deployment.auth_migration_backup (
-      old_user_id uuid NOT NULL,
-      email text NOT NULL,
-      role text,
-      ulb_id uuid,
-      label text
-    );
-
     DELETE FROM deployment.auth_migration_backup
     WHERE old_user_id IN (${ids});
 
