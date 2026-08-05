@@ -40,11 +40,38 @@ async function createUser(account) {
     try { body = JSON.parse(text) } catch { body = text }
   }
   const code = typeof body === 'object' && body ? (body.error_code ?? body.code) : null
-  if (response.status === 422 || code === 'email_exists' || code === 'user_already_exists') return false
+  if (code === 'email_exists' || code === 'user_already_exists') return null
   if (!response.ok) {
     throw new Error(`POST /auth/v1/admin/users failed (${response.status}): ${typeof body === 'string' ? body : JSON.stringify(body)}`)
   }
-  return true
+  return body
+}
+
+async function listUsers() {
+  const users = []
+  for (let page = 1; ; page += 1) {
+    const response = await fetch(`${baseUrl}/auth/v1/admin/users?page=${page}&per_page=1000`, { headers })
+    const body = await response.json().catch(() => ({}))
+    if (!response.ok) throw new Error(`GET /auth/v1/admin/users failed (${response.status}): ${JSON.stringify(body)}`)
+    const batch = Array.isArray(body) ? body : (body.users ?? [])
+    users.push(...batch)
+    if (batch.length < 1000) return users
+  }
+}
+
+async function updateUser(id, account) {
+  const response = await fetch(`${baseUrl}/auth/v1/admin/users/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({
+      email: account.email,
+      password: account.password,
+      email_confirm: true,
+      app_metadata: { provider: 'email', providers: ['email'] },
+    }),
+  })
+  const text = await response.text()
+  if (!response.ok) throw new Error(`PUT /auth/v1/admin/users/${id} failed (${response.status}): ${text || 'unknown error'}`)
 }
 
 async function main() {
@@ -59,21 +86,36 @@ async function main() {
     }),
   ]
 
+  const users = await listUsers()
+  const existingByEmail = new Map(
+    users.filter((user) => user.id && user.email).map((user) => [user.email.toLowerCase(), user]),
+  )
   let created = 0
-  let skipped = 0
+  let updated = 0
 
   for (const account of desired) {
-    const wasCreated = await createUser(account)
-    if (!wasCreated) {
-      console.log(`SKIP   ${account.email}`)
-      skipped += 1
+    const existing = existingByEmail.get(account.email)
+    if (existing) {
+      await updateUser(existing.id, account)
+      console.log(`UPDATE ${account.email}`)
+      updated += 1
+      continue
+    }
+    const result = await createUser(account)
+    if (!result) {
+      const refreshed = await listUsers()
+      const matched = refreshed.find((user) => user.email?.toLowerCase() === account.email)
+      if (!matched?.id) throw new Error(`Account ${account.email} already exists but could not be loaded`)
+      await updateUser(matched.id, account)
+      console.log(`UPDATE ${account.email}`)
+      updated += 1
       continue
     }
     console.log(`CREATE ${account.email}`)
     created += 1
   }
 
-  console.log(`User provisioning complete: ${created} created, ${skipped} already existed.`)
+  console.log(`User provisioning complete: ${created} created, ${updated} updated through GoTrue.`)
 }
 
 main().catch((error) => {

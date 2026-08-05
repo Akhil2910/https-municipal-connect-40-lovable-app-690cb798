@@ -822,6 +822,9 @@ ALTER TABLE ONLY public.tenders
 ALTER TABLE ONLY public.ulb_admins
     ADD CONSTRAINT ulb_admins_ulb_id_fkey FOREIGN KEY (ulb_id) REFERENCES public.ulbs(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.ulb_admins
+    ADD CONSTRAINT ulb_admins_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+
 
 --
 -- Name: user_roles user_roles_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -

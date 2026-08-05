@@ -38,6 +38,7 @@ services:
       GOTRUE_DISABLE_SIGNUP: "true"          # admins are created by us, not self-signup
       GOTRUE_MAILER_AUTOCONFIRM: "true"
       GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      GOTRUE_LOG_LEVEL: info
 
   rest:
     image: postgrest/postgrest:v12.2.3

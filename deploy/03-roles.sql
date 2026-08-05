@@ -20,6 +20,10 @@ DELETE FROM public.ulb_admins a
 USING deployment.auth_migration_backup b
 WHERE a.user_id = b.old_user_id;
 
+DELETE FROM public.user_roles r
+USING deployment.auth_migration_backup b
+WHERE r.user_id = b.old_user_id;
+
 -- Restore every assignment captured before legacy accounts were recreated.
 INSERT INTO public.user_roles (user_id, role)
 SELECT DISTINCT au.id, b.role::public.app_role
@@ -42,7 +46,7 @@ SELECT
     id,
     'super_admin'::public.app_role
 FROM auth.users
-WHERE email='superadmin@portal.local'
+WHERE lower(email) = 'superadmin@portal.local'
 ON CONFLICT (user_id, role) DO NOTHING;
 
 -- ============================================================
@@ -55,7 +59,7 @@ SELECT
     'admin'::public.app_role
 FROM auth.users au
 JOIN public.ulbs u
-ON au.email =
+ON lower(au.email) =
     lower(replace(u.slug,'-','')) || 'admin@portal.local'
 ON CONFLICT (user_id, role) DO NOTHING;
 
@@ -75,7 +79,7 @@ SELECT
     u.name || ' Admin'
 FROM auth.users au
 JOIN public.ulbs u
-ON au.email =
+ON lower(au.email) =
     lower(replace(u.slug,'-','')) || 'admin@portal.local'
 ON CONFLICT (user_id, ulb_id)
 DO NOTHING;
@@ -94,5 +98,21 @@ ORDER BY
     r.role,
     u.email;
 
-DROP TABLE deployment.auth_migration_backup;
-DROP SCHEMA deployment;
+-- Existing installations did not always include this relationship. Add it
+-- only after old IDs have been remapped to the recreated GoTrue users.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'ulb_admins_user_id_fkey'
+          AND conrelid = 'public.ulb_admins'::regclass
+    ) THEN
+        ALTER TABLE public.ulb_admins
+            ADD CONSTRAINT ulb_admins_user_id_fkey
+            FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+    END IF;
+END $$;
+
+-- Keep deployment.auth_migration_backup as an audit trail. Its unique index
+-- makes repeated migrations idempotent and prevents duplicate backup rows.
