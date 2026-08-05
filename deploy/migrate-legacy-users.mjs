@@ -54,9 +54,11 @@ function prepareMigration(legacyUsers) {
       email text NOT NULL,
       role text,
       ulb_id uuid,
-      label text,
-      PRIMARY KEY (old_user_id, role, ulb_id)
+      label text
     );
+
+    DELETE FROM public._deployment_auth_migration_backup
+    WHERE old_user_id IN (${ids});
 
     INSERT INTO public._deployment_auth_migration_backup
       (old_user_id, email, role, ulb_id, label)
@@ -69,10 +71,7 @@ function prepareMigration(legacyUsers) {
     FROM auth.users u
     LEFT JOIN public.user_roles r ON r.user_id = u.id
     LEFT JOIN public.ulb_admins a ON a.user_id = u.id
-    WHERE u.id IN (${ids})
-    ON CONFLICT (old_user_id, role, ulb_id) DO UPDATE
-      SET email = EXCLUDED.email,
-          label = EXCLUDED.label;
+    WHERE u.id IN (${ids});
 
     UPDATE auth.users
     SET confirmation_token = COALESCE(confirmation_token, ''),

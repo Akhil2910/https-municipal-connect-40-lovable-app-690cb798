@@ -11,8 +11,7 @@ CREATE TABLE IF NOT EXISTS public._deployment_auth_migration_backup (
     email text NOT NULL,
     role text,
     ulb_id uuid,
-    label text,
-    PRIMARY KEY (old_user_id, role, ulb_id)
+    label text
 );
 
 -- Remove mappings that point at IDs retired by the legacy-user migration.
