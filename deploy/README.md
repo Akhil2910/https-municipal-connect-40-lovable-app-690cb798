@@ -97,7 +97,8 @@ On a fresh database this creates the schema and loads all existing
 municipality, gallery, department, notice, tender, council, chairperson, media
 and public representative data. On an initialized database it preserves current
 data, migrates incompatible users left by the retired SQL provisioning script,
-creates only missing users, re-applies roles/mappings, and verifies every login.
+creates missing users, refreshes existing portal credentials through GoTrue,
+re-applies roles/mappings, and verifies every login.
 
 Expected final output includes:
 
