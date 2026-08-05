@@ -23,19 +23,6 @@ function readSlugs() {
   return output.split('\n').map((value) => value.trim()).filter(Boolean)
 }
 
-async function request(path, options = {}) {
-  const response = await fetch(`${baseUrl}${path}`, { ...options, headers: { ...headers, ...options.headers } })
-  const text = await response.text()
-  let body = null
-  if (text) {
-    try { body = JSON.parse(text) } catch { body = text }
-  }
-  if (!response.ok) {
-    throw new Error(`${options.method ?? 'GET'} ${path} failed (${response.status}): ${typeof body === 'string' ? body : JSON.stringify(body)}`)
-  }
-  return body
-}
-
 async function createUser(account) {
   const response = await fetch(`${baseUrl}/auth/v1/admin/users`, {
     method: 'POST',
