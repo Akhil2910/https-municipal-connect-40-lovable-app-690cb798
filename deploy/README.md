@@ -69,8 +69,8 @@ Copy all four generated key lines into `.env`. Set a strong
 
 For local setup, keep `SUPABASE_URL` and `VITE_SUPABASE_URL` as
 `http://localhost:8000`. On EC2, use the API domain such as
-`https://api.example.gov.in`; before HTTPS/DNS is ready you may temporarily use
-`http://<ELASTIC-IP>:8000`.
+`https://api.example.gov.in`. Ports 5432 and 8000 are bound to localhost for
+production safety; Nginx exposes the API and pgAdmin connects through SSH.
 
 For local storage, keep `STORAGE_BACKEND=file`. For S3, set:
 
