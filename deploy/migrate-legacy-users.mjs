@@ -28,6 +28,13 @@ function readLegacyUsers() {
     FROM auth.users
     WHERE email IS NOT NULL
       AND (
+        lower(email) = 'superadmin@portal.local'
+        OR lower(email) IN (
+          SELECT lower(replace(slug, '-', '')) || 'admin@portal.local'
+          FROM public.ulbs
+        )
+      )
+      AND (
         confirmation_token IS NULL
         OR recovery_token IS NULL
         OR email_change_token_current IS NULL
@@ -49,7 +56,8 @@ function readLegacyUsers() {
 function prepareMigration(legacyUsers) {
   const ids = legacyUsers.map(({ id }) => `'${id}'::uuid`).join(', ')
   sql(`
-    CREATE TABLE IF NOT EXISTS public._deployment_auth_migration_backup (
+    CREATE SCHEMA IF NOT EXISTS deployment;
+    CREATE TABLE IF NOT EXISTS deployment.auth_migration_backup (
       old_user_id uuid NOT NULL,
       email text NOT NULL,
       role text,
@@ -57,10 +65,10 @@ function prepareMigration(legacyUsers) {
       label text
     );
 
-    DELETE FROM public._deployment_auth_migration_backup
+    DELETE FROM deployment.auth_migration_backup
     WHERE old_user_id IN (${ids});
 
-    INSERT INTO public._deployment_auth_migration_backup
+    INSERT INTO deployment.auth_migration_backup
       (old_user_id, email, role, ulb_id, label)
     SELECT
       u.id,
@@ -95,7 +103,7 @@ async function deleteUser(id) {
   const text = await response.text()
   throw new Error(
     `GoTrue could not delete legacy user ${id} (${response.status}): ${text || 'unknown error'}. ` +
-      'No auth table was changed. Restore from backup if needed and see deploy/README.md.',
+      'The compatibility repair and assignment backup are safe to rerun; see deploy/README.md.',
   )
 }
 

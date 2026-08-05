@@ -36,14 +36,28 @@ async function request(path, options = {}) {
   return body
 }
 
-async function listUsers() {
-  const users = []
-  for (let page = 1; ; page += 1) {
-    const result = await request(`/auth/v1/admin/users?page=${page}&per_page=1000`)
-    const batch = Array.isArray(result) ? result : (result?.users ?? [])
-    users.push(...batch)
-    if (batch.length < 1000) return users
+async function createUser(account) {
+  const response = await fetch(`${baseUrl}/auth/v1/admin/users`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      email: account.email,
+      password: account.password,
+      email_confirm: true,
+      app_metadata: { provider: 'email', providers: ['email'] },
+    }),
+  })
+  const text = await response.text()
+  let body = null
+  if (text) {
+    try { body = JSON.parse(text) } catch { body = text }
   }
+  const code = typeof body === 'object' && body ? (body.error_code ?? body.code) : null
+  if (response.status === 422 || code === 'email_exists' || code === 'user_already_exists') return false
+  if (!response.ok) {
+    throw new Error(`POST /auth/v1/admin/users failed (${response.status}): ${typeof body === 'string' ? body : JSON.stringify(body)}`)
+  }
+  return true
 }
 
 async function main() {
@@ -58,28 +72,17 @@ async function main() {
     }),
   ]
 
-  const users = await listUsers()
-  const existing = new Set(users.map((user) => user.email?.toLowerCase()).filter(Boolean))
   let created = 0
   let skipped = 0
 
   for (const account of desired) {
-    if (existing.has(account.email)) {
+    const wasCreated = await createUser(account)
+    if (!wasCreated) {
       console.log(`SKIP   ${account.email}`)
       skipped += 1
       continue
     }
-    await request('/auth/v1/admin/users', {
-      method: 'POST',
-      body: JSON.stringify({
-        email: account.email,
-        password: account.password,
-        email_confirm: true,
-        app_metadata: { provider: 'email', providers: ['email'] },
-      }),
-    })
     console.log(`CREATE ${account.email}`)
-    existing.add(account.email)
     created += 1
   }
 

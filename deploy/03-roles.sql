@@ -6,7 +6,8 @@
 --   data.sql
 -- ============================================================
 
-CREATE TABLE IF NOT EXISTS public._deployment_auth_migration_backup (
+CREATE SCHEMA IF NOT EXISTS deployment;
+CREATE TABLE IF NOT EXISTS deployment.auth_migration_backup (
     old_user_id uuid NOT NULL,
     email text NOT NULL,
     role text,
@@ -16,20 +17,20 @@ CREATE TABLE IF NOT EXISTS public._deployment_auth_migration_backup (
 
 -- Remove mappings that point at IDs retired by the legacy-user migration.
 DELETE FROM public.ulb_admins a
-USING public._deployment_auth_migration_backup b
+USING deployment.auth_migration_backup b
 WHERE a.user_id = b.old_user_id;
 
 -- Restore every assignment captured before legacy accounts were recreated.
 INSERT INTO public.user_roles (user_id, role)
 SELECT DISTINCT au.id, b.role::public.app_role
-FROM public._deployment_auth_migration_backup b
+FROM deployment.auth_migration_backup b
 JOIN auth.users au ON lower(au.email) = b.email
 WHERE b.role IS NOT NULL
 ON CONFLICT (user_id, role) DO NOTHING;
 
 INSERT INTO public.ulb_admins (user_id, ulb_id, label)
 SELECT DISTINCT au.id, b.ulb_id, b.label
-FROM public._deployment_auth_migration_backup b
+FROM deployment.auth_migration_backup b
 JOIN auth.users au ON lower(au.email) = b.email
 WHERE b.ulb_id IS NOT NULL
 ON CONFLICT (user_id, ulb_id) DO UPDATE SET label = EXCLUDED.label;
@@ -93,4 +94,5 @@ ORDER BY
     r.role,
     u.email;
 
-DROP TABLE public._deployment_auth_migration_backup;
+DROP TABLE deployment.auth_migration_backup;
+DROP SCHEMA deployment;
