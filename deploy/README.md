@@ -14,9 +14,10 @@ roles, mappings and permissions.
 The deployment uses a pinned current GoTrue release. Old deployments created
 users with SQL and left token fields as `NULL`; GoTrue requires those fields to
 be strings and therefore cannot even load or delete the affected row. The
-migration automatically stages public role/mapping assignments, changes only
-those legacy `NULL` token fields to empty strings, and then deletes the users
-through GoTrue's Admin API. All recreated users are managed only by that API.
+ migration automatically stages public role/mapping assignments, changes only
+ legacy `NULL` string fields to empty strings so GoTrue can read every row, and
+ then deletes portal users through GoTrue's Admin API. All recreated users are
+ managed only by that API.
 
 Deployment order:
 
@@ -120,8 +121,8 @@ Examples:
 - `kohiradmin@portal.local` / `kohir@123`
 - `stationghanpuradmin@portal.local` / `stationghanpur@123`
 
-Existing accounts are never duplicated or overwritten. To provision missing
-accounts only:
+Existing compatible accounts are not duplicated. To run each automated stage
+separately:
 
 ```bash
 npm run deploy:migrate-users
@@ -253,12 +254,13 @@ npm run deploy:roles
 npm run deploy:verify
 ```
 
-The migration is idempotent: when no incompatible rows exist it prints a message
-and continues. It performs one narrowly scoped SQL compatibility update from
-`NULL` to `''` because GoTrue cannot load the malformed rows otherwise. It does
-not delete users or manage passwords with SQL; deletion and recreation use the
-supported GoTrue Admin API. `03-roles.sql` restores `user_roles` and
-`ulb_admins` against the recreated user IDs and removes stale mappings.
+The migration is idempotent. It first backs up the portal accounts' public role
+and municipality assignments. It then performs one narrowly scoped SQL
+compatibility update from `NULL` to `''` on GoTrue string fields because one
+malformed row can break GoTrue's email check for every account. It never deletes
+users or manages passwords with SQL: deletion and recreation use the supported
+GoTrue Admin API. `03-roles.sql` restores `user_roles` and `ulb_admins` against
+the recreated IDs. Website content tables are not modified.
 
 If `.env` API URLs change, rebuild because Vite embeds the browser URL:
 

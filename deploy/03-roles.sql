@@ -20,6 +20,10 @@ DELETE FROM public.ulb_admins a
 USING deployment.auth_migration_backup b
 WHERE a.user_id = b.old_user_id;
 
+DELETE FROM public.user_roles r
+USING deployment.auth_migration_backup b
+WHERE r.user_id = b.old_user_id;
+
 -- Restore every assignment captured before legacy accounts were recreated.
 INSERT INTO public.user_roles (user_id, role)
 SELECT DISTINCT au.id, b.role::public.app_role

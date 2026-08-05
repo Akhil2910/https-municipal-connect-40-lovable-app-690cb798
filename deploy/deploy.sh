@@ -9,6 +9,7 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
+echo "Starting PostgreSQL and backend services..."
 docker compose -f deploy/docker-compose.yml --env-file .env up -d
 
 echo "Waiting for PostgreSQL and GoTrue..."
@@ -31,9 +32,16 @@ else
   echo "Schema and municipality data already exist; preserving current data."
 fi
 
-# The migration first makes old SQL-created rows readable by GoTrue, stages
-# their public assignments, and then removes those users through the Admin API.
+echo "Checking for legacy SQL-created authentication users..."
+# The migration stages public assignments, normalizes malformed legacy string
+# fields so GoTrue can read every row, and removes portal users via Admin API.
 SUPABASE_URL=http://localhost:8000 node --env-file=.env deploy/migrate-legacy-users.mjs
+
+echo "Provisioning portal users through the GoTrue Admin API..."
 SUPABASE_URL=http://localhost:8000 node --env-file=.env deploy/create-users.mjs
+
+echo "Restoring roles and municipality mappings..."
 docker exec -i portal-db psql -v ON_ERROR_STOP=1 -U postgres -d postgres < deploy/03-roles.sql
+
+echo "Verifying users, assignments, and real password logins..."
 SUPABASE_URL=http://localhost:8000 node --env-file=.env deploy/verify-deployment.mjs

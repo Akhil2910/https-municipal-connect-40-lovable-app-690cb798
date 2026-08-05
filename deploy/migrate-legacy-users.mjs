@@ -22,7 +22,7 @@ function sql(query) {
   ).trim()
 }
 
-function readLegacyUsers() {
+function ensureBackupTable() {
   sql(`
     CREATE SCHEMA IF NOT EXISTS deployment;
     CREATE TABLE IF NOT EXISTS deployment.auth_migration_backup (
@@ -32,7 +32,17 @@ function readLegacyUsers() {
       ulb_id uuid,
       label text
     );
+    CREATE UNIQUE INDEX IF NOT EXISTS auth_migration_backup_assignment_idx
+      ON deployment.auth_migration_backup (
+        old_user_id,
+        COALESCE(role, ''),
+        COALESCE(ulb_id::text, ''),
+        COALESCE(label, '')
+      );
   `)
+}
+
+function readLegacyUsers() {
   const output = sql(`
     SELECT id::text, lower(email)
     FROM auth.users u
@@ -68,12 +78,39 @@ function readLegacyUsers() {
   })
 }
 
+function normalizeMalformedAuthRows() {
+  const count = Number(sql(`
+    SELECT count(*)
+    FROM auth.users
+    WHERE confirmation_token IS NULL
+       OR recovery_token IS NULL
+       OR email_change_token_current IS NULL
+       OR email_change_token_new IS NULL
+       OR email_change IS NULL
+       OR phone_change_token IS NULL
+       OR phone_change IS NULL
+       OR reauthentication_token IS NULL;
+  `))
+
+  if (count === 0) return 0
+
+  sql(`
+    UPDATE auth.users
+    SET confirmation_token = COALESCE(confirmation_token, ''),
+        recovery_token = COALESCE(recovery_token, ''),
+        email_change_token_current = COALESCE(email_change_token_current, ''),
+        email_change_token_new = COALESCE(email_change_token_new, ''),
+        email_change = COALESCE(email_change, ''),
+        phone_change_token = COALESCE(phone_change_token, ''),
+        phone_change = COALESCE(phone_change, ''),
+        reauthentication_token = COALESCE(reauthentication_token, '');
+  `)
+  return count
+}
+
 function prepareMigration(legacyUsers) {
   const ids = legacyUsers.map(({ id }) => `'${id}'::uuid`).join(', ')
   sql(`
-    DELETE FROM deployment.auth_migration_backup
-    WHERE old_user_id IN (${ids});
-
     INSERT INTO deployment.auth_migration_backup
       (old_user_id, email, role, ulb_id, label)
     SELECT
@@ -85,18 +122,14 @@ function prepareMigration(legacyUsers) {
     FROM auth.users u
     LEFT JOIN public.user_roles r ON r.user_id = u.id
     LEFT JOIN public.ulb_admins a ON a.user_id = u.id
-    WHERE u.id IN (${ids});
+    WHERE u.id IN (${ids})
+    ON CONFLICT DO NOTHING;
 
-    UPDATE auth.users
-    SET confirmation_token = COALESCE(confirmation_token, ''),
-        recovery_token = COALESCE(recovery_token, ''),
-        email_change_token_current = COALESCE(email_change_token_current, ''),
-        email_change_token_new = COALESCE(email_change_token_new, ''),
-        email_change = COALESCE(email_change, ''),
-        phone_change_token = COALESCE(phone_change_token, ''),
-        phone_change = COALESCE(phone_change, ''),
-        reauthentication_token = COALESCE(reauthentication_token, '')
-    WHERE id IN (${ids});
+    -- Some old installations added restrictive auth-user foreign keys. Remove
+    -- only the staged public assignments before asking GoTrue to delete users;
+    -- 03-roles.sql restores them against the newly created IDs.
+    DELETE FROM public.ulb_admins WHERE user_id IN (${ids});
+    DELETE FROM public.user_roles WHERE user_id IN (${ids});
   `)
 }
 
@@ -114,22 +147,31 @@ async function deleteUser(id) {
 }
 
 async function main() {
+  ensureBackupTable()
   const legacyUsers = readLegacyUsers()
-  if (legacyUsers.length === 0) {
-    console.log('Legacy auth migration: no incompatible users found.')
-    return
+  if (legacyUsers.length > 0) {
+    console.log(`Legacy auth migration: found ${legacyUsers.length} portal account(s) to recreate.`)
+    console.log('Saving role and municipality assignments before GoTrue removes the old accounts.')
+    prepareMigration(legacyUsers)
   }
 
-  console.log(`Legacy auth migration: found ${legacyUsers.length} incompatible user(s).`)
-  console.log('Saving role/mapping assignments and applying the GoTrue nullable-token compatibility repair.')
-  prepareMigration(legacyUsers)
+  // GoTrue checks the users table while creating an account. A malformed row
+  // for any email can therefore break creation of every portal account. Repair
+  // all nullable legacy string fields before making any Admin API request.
+  const normalized = normalizeMalformedAuthRows()
+  console.log(`Legacy auth migration: normalized ${normalized} malformed auth row(s).`)
+
+  if (legacyUsers.length === 0) {
+    console.log('Legacy auth migration: no portal accounts require recreation.')
+    return
+  }
 
   for (const user of legacyUsers) {
     await deleteUser(user.id)
     console.log(`DELETE ${user.email} (GoTrue Admin API)`)
   }
 
-  console.log('Legacy auth migration complete. Users can now be recreated through the GoTrue Admin API.')
+  console.log('Legacy auth migration complete. Portal accounts can now be recreated through the GoTrue Admin API.')
 }
 
 main().catch((error) => {
