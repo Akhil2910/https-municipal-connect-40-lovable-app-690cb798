@@ -11,10 +11,12 @@ No deployment SQL inserts into `auth.users` or `auth.identities`, and no SQL
 hashes passwords. SQL is limited to the application schema, municipality data,
 roles, mappings and permissions.
 
-The deployment uses a current GoTrue release. Its official startup migrations
-normalize legacy nullable auth token columns before the cleanup utility calls
-the Admin API. The utility itself only performs a read-only diagnostic query;
-it never updates or deletes auth rows with SQL.
+The deployment uses a pinned current GoTrue release. Old deployments created
+users with SQL and left token fields as `NULL`; GoTrue requires those fields to
+be strings and therefore cannot even load or delete the affected row. The
+migration automatically stages public role/mapping assignments, changes only
+those legacy `NULL` token fields to empty strings, and then deletes the users
+through GoTrue's Admin API. All recreated users are managed only by that API.
 
 Deployment order:
 
@@ -22,7 +24,7 @@ Deployment order:
 docker compose up
   -> deploy/01-schema.sql
   -> deploy/02-seed.sql
-  -> deploy/migrate-legacy-users.mjs (supported GoTrue Admin API cleanup)
+  -> deploy/migrate-legacy-users.mjs (compatibility repair + Admin API cleanup)
   -> deploy/create-users.mjs (GoTrue Admin API)
   -> deploy/03-roles.sql
   -> deploy/verify-deployment.mjs
@@ -67,8 +69,8 @@ Copy all four generated key lines into `.env`. Set a strong
 
 For local setup, keep `SUPABASE_URL` and `VITE_SUPABASE_URL` as
 `http://localhost:8000`. On EC2, use the API domain such as
-`https://api.example.gov.in`; before HTTPS/DNS is ready you may temporarily use
-`http://<ELASTIC-IP>:8000`.
+`https://api.example.gov.in`. Ports 5432 and 8000 are bound to localhost for
+production safety; Nginx exposes the API and pgAdmin connects through SSH.
 
 For local storage, keep `STORAGE_BACKEND=file`. For S3, set:
 
@@ -102,7 +104,6 @@ Expected final output includes:
 ✓ Super Admin exists
 ✓ Municipality Admins exist
 ✓ Super Admin login succeeds
-✓ Mulugu Admin login succeeds
 ✓ All 21 municipality logins succeed
 Deployment verification passed.
 ```
@@ -219,8 +220,10 @@ pm2 restart portal
 ```
 
 The backend deployment preserves initialized content. It detects legacy
-SQL-created auth rows, removes only those users through GoTrue's Admin API,
-recreates them through that same API, and then restores roles and ULB mappings.
+SQL-created auth rows, saves their assignments, performs the one-time nullable
+token compatibility repair needed to make them readable, removes the users
+through GoTrue's Admin API, recreates them through that same API, and restores
+roles and ULB mappings.
 Municipality, gallery, notice, department, and all other website tables are
 never deleted or reseeded during an update.
 
@@ -251,10 +254,11 @@ npm run deploy:verify
 ```
 
 The migration is idempotent: when no incompatible rows exist it prints a message
-and continues. It never updates or deletes `auth.users` with SQL. SQL is used
-read-only to identify malformed legacy rows; deletion and recreation use the
+and continues. It performs one narrowly scoped SQL compatibility update from
+`NULL` to `''` because GoTrue cannot load the malformed rows otherwise. It does
+not delete users or manage passwords with SQL; deletion and recreation use the
 supported GoTrue Admin API. `03-roles.sql` restores `user_roles` and
-`ulb_admins` against the recreated user IDs.
+`ulb_admins` against the recreated user IDs and removes stale mappings.
 
 If `.env` API URLs change, rebuild because Vite embeds the browser URL:
 
@@ -293,7 +297,7 @@ Do not delete `db-data` or `storage-data` during a normal code rollback.
 |---|---|
 | `01-schema.sql` | Application tables, functions, RLS and permissions |
 | `02-seed.sql` | All existing municipality and website content |
-| `migrate-legacy-users.mjs` | Detects malformed legacy users and deletes them through GoTrue |
+| `migrate-legacy-users.mjs` | Repairs malformed legacy rows, stages assignments, and deletes users through GoTrue |
 | `create-users.mjs` | Idempotent GoTrue Admin API user provisioning |
 | `03-roles.sql` | Idempotent application roles and ULB mappings |
 | `verify-deployment.mjs` | Database, role, mapping and real login checks |
