@@ -16,8 +16,9 @@ users with SQL and left token fields as `NULL`; GoTrue requires those fields to
 be strings and therefore cannot even load or delete the affected row. The
  migration automatically stages public role/mapping assignments, changes only
  legacy `NULL` string fields to empty strings so GoTrue can read every row, and
- then deletes portal users through GoTrue's Admin API. All recreated users are
- managed only by that API.
+then deletes portal users through GoTrue's Admin API. All recreated users are
+managed only by that API. The assignment backup remains in the private
+`deployment` schema as an idempotent migration audit trail.
 
 Deployment order:
 
@@ -302,7 +303,7 @@ Do not delete `db-data` or `storage-data` during a normal code rollback.
 | `02-seed.sql` | All existing municipality and website content |
 | `migrate-legacy-users.mjs` | Repairs malformed legacy rows, stages assignments, and deletes users through GoTrue |
 | `create-users.mjs` | Idempotent GoTrue Admin API user provisioning |
-| `03-roles.sql` | Idempotent application roles and ULB mappings |
+| `03-roles.sql` | Idempotent roles, ULB mappings, and user cascade constraint |
 | `verify-deployment.mjs` | Database, role, mapping and real login checks |
 | `deploy.sh` | Complete backend deployment orchestrator |
 | `docker-compose.yml` | PostgreSQL, GoTrue, PostgREST, Storage and Kong |

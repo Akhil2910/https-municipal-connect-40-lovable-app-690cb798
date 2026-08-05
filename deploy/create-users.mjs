@@ -40,7 +40,7 @@ async function createUser(account) {
     try { body = JSON.parse(text) } catch { body = text }
   }
   const code = typeof body === 'object' && body ? (body.error_code ?? body.code) : null
-  if (response.status === 422 || code === 'email_exists' || code === 'user_already_exists') return null
+  if (code === 'email_exists' || code === 'user_already_exists') return null
   if (!response.ok) {
     throw new Error(`POST /auth/v1/admin/users failed (${response.status}): ${typeof body === 'string' ? body : JSON.stringify(body)}`)
   }
