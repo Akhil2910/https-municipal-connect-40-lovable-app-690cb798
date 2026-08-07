@@ -107,7 +107,7 @@ Click **Save**. Changes can take up to 5 minutes to take effect.
 Connect to the server, then:
 
 ```bash
-cd ~/municipal-portal          # your project folder
+cd ~/https-municipal-connect-40-lovable-app   # your project folder (or /path/to/your/project)
 git pull                       # get the latest code
 nano .env                      # add: GOOGLE_API_KEY=AIza...your-key...
 npm install
@@ -121,7 +121,8 @@ admin panel are untouched.
 
 ## Part 8 — Test
 
-1. Visit each municipality site over HTTPS, e.g. `https://mulugumunicipality.in`.
+1. Visit each municipality site over HTTPS, e.g. `https://mulugumunicipality.telangana.gov.in`
+   (other sites follow the same pattern, e.g. `https://asifabadmunicipality.telangana.gov.in`).
 2. The panel shows a temperature, "Feels like", humidity, wind, rain chance, UV and AQI.
 3. Reload the page — it should be instant, because results are cached on the server
    for 10 minutes per municipality.
