@@ -35,13 +35,13 @@ export function WeatherPanel({ slug, ulbName }: { slug: string; ulbName: string 
         </div>
       )}
 
-      {(error || (data && data.error)) && !isLoading && (
+      {(error || (data && data.error && !data.weather && !data.air)) && !isLoading && (
         <div className="flex-1 flex items-center justify-center p-6 text-center text-sm text-white/70">
-          Live data unavailable right now.
+          {(data?.error as string | undefined) ?? "Live data unavailable right now."}
         </div>
       )}
 
-      {data && !data.error && (
+      {data && (data.weather || data.air) && (
         <div className="flex-1 p-5 grid gap-4">
           {/* Temperature hero */}
           <div
