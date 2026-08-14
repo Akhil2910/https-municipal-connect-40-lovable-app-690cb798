@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Accessibility } from "lucide-react";
+import { Accessibility, ArrowLeft } from "lucide-react";
 
 function setFontScale(scale: number) {
   if (typeof document === "undefined") return;
@@ -21,9 +21,21 @@ export function TopGovBar({ ulbName }: { ulbName?: string }) {
   return (
     <div className="bg-gov-navy text-primary-foreground text-xs">
       <div className="container mx-auto flex flex-wrap items-center justify-between gap-2 px-4 py-1.5">
-        <span className="opacity-90">
-          Government of Telangana · {ulbName ?? "Urban Local Bodies"}
-        </span>
+        <div className="flex items-center gap-2">
+          {ulbName && (
+            <Link
+              to="/"
+              onClick={() => { try { sessionStorage.setItem("skip-launch", "1"); } catch {} }}
+              className="inline-flex items-center gap-1 rounded-full bg-white/10 hover:bg-white/20 px-2.5 py-1 font-semibold transition"
+              aria-label="Back to all municipalities"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> All Municipalities
+            </Link>
+          )}
+          <span className="opacity-90">
+            Government of Telangana · {ulbName ?? "Urban Local Bodies"}
+          </span>
+        </div>
         <div className="flex items-center gap-2 md:gap-3">
           <Link
             to="/screen-reader"
