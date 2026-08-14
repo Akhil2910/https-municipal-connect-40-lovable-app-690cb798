@@ -32,7 +32,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { ulbs } = Route.useLoaderData() as { ulbs: Ulb[] };
+  const VISIBLE_SLUGS = ["mulugu", "chevella", "moinabad", "kohir", "aswaraopeta", "kalluru"];
+  const { ulbs: allUlbs } = Route.useLoaderData() as { ulbs: Ulb[] };
+  const ulbs = allUlbs.filter((u) => VISIBLE_SLUGS.includes(u.slug));
   return (
     <div className="min-h-screen flex flex-col">
       <TopGovBar />
@@ -66,7 +68,7 @@ function Index() {
           <div className="flex items-end justify-between mb-8">
             <div>
               <p className="text-sm font-bold uppercase tracking-widest text-accent">Choose your Municipality</p>
-              <h3 className="font-display text-3xl font-black text-gov-navy">All 21 Urban Local Bodies</h3>
+              <h3 className="font-display text-3xl font-black text-gov-navy">Urban Local Bodies</h3>
             </div>
             <p className="text-sm text-muted-foreground hidden md:block">{ulbs.length} municipalities</p>
           </div>
