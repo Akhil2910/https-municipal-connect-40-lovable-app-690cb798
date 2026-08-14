@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Scissors, ArrowRight } from "lucide-react";
 
-const sridevi = "/images/tk-sridevi.webp";
+import sridevriAsset from "@/assets/sreedevi.jpg.asset.json";
+const sridevi = sridevriAsset.url;
 const emblem = "/logos/telangana-emblem.png";
 const flag = "/images/independence-80.jpg";
 
