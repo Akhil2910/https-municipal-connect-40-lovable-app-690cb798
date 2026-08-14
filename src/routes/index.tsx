@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getHostSlug } from "@/lib/host.functions";
 import { TopGovBar } from "@/components/site/TopGovBar";
 import { Footer } from "@/components/site/Footer";
+import { LaunchDoors } from "@/components/site/LaunchDoors";
 const emblem = "/logos/ulb-emblem.png";
 const hero = "/images/hero-default.jpg";
 import { Building2, ArrowRight } from "lucide-react";
@@ -45,6 +46,7 @@ function Index() {
   const ulbs = LAUNCH_MODE ? allUlbs.filter((u) => LAUNCH_SLUGS.includes(u.slug)) : allUlbs;
   return (
     <div className="min-h-screen flex flex-col">
+      <LaunchDoors />
       <TopGovBar />
       <header className="bg-card border-b">
         <div className="container mx-auto flex items-center gap-4 px-4 py-4">
