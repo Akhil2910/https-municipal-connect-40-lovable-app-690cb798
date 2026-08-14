@@ -31,10 +31,18 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+/**
+ * LAUNCH MODE — temporary.
+ * While only the launch municipalities should be visible on the home page,
+ * keep LAUNCH_MODE = true.
+ * AFTER THE LAUNCH PROGRAM: set LAUNCH_MODE = false to show all 21 again.
+ */
+const LAUNCH_MODE = true;
+const LAUNCH_SLUGS = ["mulugu", "chevella", "moinabad", "kohir", "aswaraopeta", "kalluru"];
+
 function Index() {
-  const VISIBLE_SLUGS = ["mulugu", "chevella", "moinabad", "kohir", "aswaraopeta", "kalluru"];
   const { ulbs: allUlbs } = Route.useLoaderData() as { ulbs: Ulb[] };
-  const ulbs = allUlbs.filter((u) => VISIBLE_SLUGS.includes(u.slug));
+  const ulbs = LAUNCH_MODE ? allUlbs.filter((u) => LAUNCH_SLUGS.includes(u.slug)) : allUlbs;
   return (
     <div className="min-h-screen flex flex-col">
       <TopGovBar />
@@ -68,7 +76,9 @@ function Index() {
           <div className="flex items-end justify-between mb-8">
             <div>
               <p className="text-sm font-bold uppercase tracking-widest text-accent">Choose your Municipality</p>
-              <h3 className="font-display text-3xl font-black text-gov-navy">Urban Local Bodies</h3>
+              <h3 className="font-display text-3xl font-black text-gov-navy">
+                {LAUNCH_MODE ? "Urban Local Bodies" : "All 21 Urban Local Bodies"}
+              </h3>
             </div>
             <p className="text-sm text-muted-foreground hidden md:block">{ulbs.length} municipalities</p>
           </div>
