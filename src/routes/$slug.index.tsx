@@ -4,6 +4,7 @@ import { useUlb } from "./$slug";
 import { Ticker } from "@/components/site/Ticker";
 import { OnlineServices } from "@/components/site/OnlineServices";
 import { WeatherPanel } from "@/components/site/WeatherPanel";
+import { Celebration } from "@/components/site/Celebration";
 const hero = "/images/hero-default.jpg";
 import { ArrowRight, Users, MapPin, Calendar, Landmark, Target, Eye, Map as MapIcon } from "lucide-react";
 import type { News, Notice, Banner, Leadership } from "@/lib/ulb-types";
@@ -53,6 +54,7 @@ function UlbHome() {
 
   return (
     <>
+      <Celebration fireworks flowers duration={7000} />
       <Ticker notices={notices} />
 
       {/* Hero / Rising Banner */}

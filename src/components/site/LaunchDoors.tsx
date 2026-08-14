@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Scissors, ArrowRight } from "lucide-react";
+import { Celebration } from "@/components/site/Celebration";
 
 import sridevriAsset from "@/assets/sreedevi.jpg.asset.json";
 const sridevi = sridevriAsset.url;
@@ -119,6 +120,7 @@ export function LaunchDoors() {
       <div
         className={`absolute inset-0 z-10 transition-opacity duration-700 ${wish ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       >
+        {wish && <Celebration fireworks flowers duration={0} />}
         <div className="relative h-full flex flex-col items-center justify-end pb-10 md:pb-14 gap-4 px-6 text-center text-white">
           <p className="font-display text-xl md:text-3xl font-black drop-shadow-lg">
             Wishing you all a Happy 80th Independence Day
