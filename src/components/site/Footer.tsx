@@ -5,6 +5,7 @@ export function Footer({ ulb }: { ulb?: Ulb }) {
   return (
     <footer className="bg-gov-navy text-primary-foreground mt-16">
       <div className="gov-tricolor-bar" />
+      {ulb && (
       <div className="container mx-auto grid gap-8 px-4 py-12 md:grid-cols-4">
         <div>
           <h3 className="font-display text-lg font-bold">{ulb?.name ?? "Telangana ULBs"}</h3>
@@ -43,6 +44,7 @@ export function Footer({ ulb }: { ulb?: Ulb }) {
           </ul>
         </div>
       </div>
+      )}
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-4 text-xs opacity-75 text-center">
           © {new Date().getFullYear()} {ulb?.name ?? "Telangana ULBs"} · All rights reserved.
