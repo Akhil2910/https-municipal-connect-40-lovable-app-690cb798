@@ -39,11 +39,13 @@ export const Route = createFileRoute("/")({
  * AFTER THE LAUNCH PROGRAM: set LAUNCH_MODE = false to show all 21 again.
  */
 const LAUNCH_MODE = true;
-const LAUNCH_SLUGS = ["mulugu", "chevella", "moinabad", "kohir", "aswaraopeta", "kalluru"];
+const LAUNCH_SLUGS = ["mulugu", "moinabad", "kohir", "chevella", "aswaraopeta", "kalluru"];
 
 function Index() {
   const { ulbs: allUlbs } = Route.useLoaderData() as { ulbs: Ulb[] };
-  const ulbs = LAUNCH_MODE ? allUlbs.filter((u) => LAUNCH_SLUGS.includes(u.slug)) : allUlbs;
+  const ulbs = LAUNCH_MODE
+    ? LAUNCH_SLUGS.map((s) => allUlbs.find((u) => u.slug === s)).filter(Boolean) as Ulb[]
+    : allUlbs;
   return (
     <div className="min-h-screen flex flex-col">
       <LaunchDoors />
