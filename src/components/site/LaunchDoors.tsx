@@ -5,29 +5,25 @@ const sridevi = "/images/tk-sridevi.webp";
 const emblem = "/logos/telangana-emblem.png";
 const flag = "/images/independence-80.jpg";
 
-const LAUNCH_KEY = "ulb-launch-2026-08-15";
-
 /**
  * LAUNCH CEREMONY OVERLAY — temporary.
- * Shown once per browser session on the home page.
+ * Shown on every visit/refresh of the home page.
  * Remove <LaunchDoors /> from src/routes/index.tsx after the launch program.
  */
 export function LaunchDoors() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [cut, setCut] = useState(false);
   const [wish, setWish] = useState(false);
   const [gone, setGone] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (sessionStorage.getItem(LAUNCH_KEY) === "1") return;
-    setVisible(true);
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
   }, []);
 
   const launch = () => {
     if (cut) return;
     setCut(true);
-    sessionStorage.setItem(LAUNCH_KEY, "1");
     window.setTimeout(() => setWish(true), 1500);
   };
 
@@ -35,9 +31,15 @@ export function LaunchDoors() {
 
   return (
     <div className="fixed inset-0 z-[100]" style={{ perspective: "1600px" }} role="dialog" aria-label="Launch ceremony">
+      {/* BACKDROP — flag stage sits behind the doors so the site is never revealed mid-animation */}
+      <div className="absolute inset-0">
+        <img src={flag} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-black/25" />
+      </div>
+
       {/* ===== STAGE 1 — CLOSED DOORS WITH ANNOUNCEMENT ===== */}
       <div
-        className={`absolute inset-0 transition-opacity duration-700 ${wish ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+        className={`absolute inset-0 z-20 transition-opacity duration-700 ${wish ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       >
         {/* LEFT DOOR */}
         <div
