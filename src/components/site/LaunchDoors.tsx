@@ -19,6 +19,14 @@ export function LaunchDoors() {
   const [gone, setGone] = useState(false);
 
   useEffect(() => {
+    // Arriving via the "All municipalities" back button skips the ceremony.
+    try {
+      if (sessionStorage.getItem("skip-launch")) {
+        sessionStorage.removeItem("skip-launch");
+        setVisible(false);
+        return;
+      }
+    } catch {}
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = ""; };
   }, []);
