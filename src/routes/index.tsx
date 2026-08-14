@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Telangana Urban Local Bodies — Official Portal" },
-      { name: "description", content: "Official portal for 21 new Urban Local Bodies (Municipalities) of Telangana. Citizen services, news, notices, tenders & grievances." },
+      { name: "description", content: "Official portal for the Urban Local Bodies (Municipalities) of Telangana. Citizen services, news, notices, tenders & grievances." },
       { property: "og:title", content: "Telangana Urban Local Bodies" },
       { property: "og:description", content: "Choose your Municipality to access citizen services online." },
     ],
@@ -60,46 +60,30 @@ function Index() {
         <section className="relative overflow-hidden">
           <img src={hero} alt="" width={1920} height={1080}
                className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0" style={{ background: "var(--gradient-hero)", opacity: 0.85 }} />
-          <div className="relative container mx-auto px-4 py-20 md:py-28 text-primary-foreground animate-fade-up">
-            <p className="text-sm uppercase tracking-[0.3em] opacity-90">Telangana · CDMA</p>
-            <h2 className="font-display text-4xl md:text-6xl font-black mt-3 max-w-3xl">
-              21 New Urban Local Bodies. One Citizen Portal.
+          <div className="absolute inset-0" style={{ background: "var(--gradient-hero)", opacity: 0.9 }} />
+          <div className="relative container mx-auto px-4 py-10 md:py-14 text-primary-foreground animate-fade-up">
+            <p className="text-xs md:text-sm uppercase tracking-[0.3em] opacity-90">Telangana · CDMA</p>
+            <h2 className="font-display text-3xl md:text-4xl font-black mt-2">
+              Choose your Municipality
             </h2>
-            <p className="mt-4 max-w-2xl text-lg opacity-95">
-              Access services, news, notices, tenders and grievance redressal for every newly notified Municipality across Telangana.
-            </p>
-          </div>
-        </section>
 
-        <section className="container mx-auto px-4 py-16">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <p className="text-sm font-bold uppercase tracking-widest text-accent">Choose your Municipality</p>
-              <h3 className="font-display text-3xl font-black text-gov-navy">
-                {LAUNCH_MODE ? "Urban Local Bodies" : "All 21 Urban Local Bodies"}
-              </h3>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {ulbs.map((u) => (
+                <Link key={u.id} to="/$slug" params={{ slug: u.slug }}
+                      className="group bg-card text-foreground border rounded-2xl p-7 md:p-8 hover:shadow-[var(--shadow-elegant)] hover:-translate-y-1 transition">
+                  <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
+                    <div className="h-14 w-14 shrink-0 rounded-xl bg-gov-cream flex items-center justify-center">
+                      <Building2 className="h-7 w-7 text-gov-green" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-display text-2xl md:text-3xl font-black text-gov-navy truncate">{u.name}</h3>
+                      <p className="text-sm text-muted-foreground truncate">{u.type} · {u.state}</p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground group-hover:text-gov-green group-hover:translate-x-0.5 transition" />
+                  </div>
+                </Link>
+              ))}
             </div>
-            <p className="text-sm text-muted-foreground hidden md:block">{ulbs.length} municipalities</p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {ulbs.map((u) => (
-              <Link key={u.id} to="/$slug" params={{ slug: u.slug }}
-                    className="group bg-card border rounded-xl p-5 hover:shadow-[var(--shadow-elegant)] hover:-translate-y-0.5 transition">
-                <div className="flex items-start gap-4">
-                  <div className="h-12 w-12 rounded-lg bg-gov-cream flex items-center justify-center shrink-0">
-                    <Building2 className="h-6 w-6 text-gov-green" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-display font-bold text-gov-navy">{u.name}</h4>
-                    <p className="text-xs text-muted-foreground">{u.type} · Code {u.code}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{u.state}</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-gov-green group-hover:translate-x-0.5 transition" />
-                </div>
-              </Link>
-            ))}
           </div>
         </section>
       </main>
