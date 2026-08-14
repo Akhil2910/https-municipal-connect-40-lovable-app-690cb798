@@ -78,7 +78,7 @@ export function LaunchDoors() {
             height={128}
             className="mt-5 h-20 w-20 md:h-28 md:w-28 rounded-full object-cover ring-4 ring-primary-foreground/60"
           />
-          <p className="mt-3 text-xs md:text-sm opacity-90">Launched by</p>
+          <p className="mt-3 text-xs md:text-sm opacity-90">Launching Today by</p>
           <p className="font-display text-lg md:text-2xl font-black">Dr. T.K. Sreedevi, IAS</p>
           <p className="text-xs md:text-sm opacity-90">Secretary, Municipal Administration Department</p>
         </div>
