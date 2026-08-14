@@ -105,7 +105,7 @@ export function LaunchDoors() {
       </div>
 
       {/* RIBBON */}
-      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-16 md:h-24">
+      <div className="absolute inset-x-0 top-[62%] -translate-y-1/2 h-16 md:h-24">
         <div
           className="absolute inset-y-0 left-0 w-1/2 origin-left transition-transform duration-[1400ms] ease-in"
           style={{
@@ -124,7 +124,7 @@ export function LaunchDoors() {
 
       {/* LAUNCH BUTTON */}
       {!cut && (
-        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center">
+        <div className="absolute inset-x-0 top-[62%] -translate-y-1/2 flex justify-center">
           <button
             onClick={launch}
             className="group relative inline-flex items-center gap-3 rounded-full bg-card px-8 py-4 md:px-12 md:py-5 font-display text-base md:text-xl font-black text-gov-navy shadow-[var(--shadow-elegant)] ring-4 ring-gov-saffron/70 transition hover:scale-105 active:scale-95"
