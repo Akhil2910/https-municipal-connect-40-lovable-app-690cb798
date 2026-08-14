@@ -116,10 +116,8 @@ export function LaunchDoors() {
 
       {/* ===== STAGE 2 — INDEPENDENCE DAY WISH ===== */}
       <div
-        className={`absolute inset-0 transition-opacity duration-700 ${wish ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`absolute inset-0 z-10 transition-opacity duration-700 ${wish ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       >
-        <img src={flag} alt="Happy 80th Independence Day" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-black/25" />
         <div className="relative h-full flex flex-col items-center justify-end pb-10 md:pb-14 gap-4 px-6 text-center text-white">
           <p className="font-display text-xl md:text-3xl font-black drop-shadow-lg">
             Wishing you all a Happy 80th Independence Day
