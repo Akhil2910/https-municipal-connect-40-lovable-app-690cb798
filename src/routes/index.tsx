@@ -38,7 +38,7 @@ export const Route = createFileRoute("/")({
  * keep LAUNCH_MODE = true.
  * AFTER THE LAUNCH PROGRAM: set LAUNCH_MODE = false to show all 21 again.
  */
-const LAUNCH_MODE = true;
+const LAUNCH_MODE = false;
 const LAUNCH_SLUGS = ["mulugu", "moinabad", "kohir", "chevella", "aswaraopeta", "kalluru"];
 
 function Index() {
