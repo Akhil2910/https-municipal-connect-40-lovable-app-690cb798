@@ -31,20 +31,8 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-/**
- * LAUNCH MODE — temporary.
- * While only the launch municipalities should be visible on the home page,
- * keep LAUNCH_MODE = true.
- * AFTER THE LAUNCH PROGRAM: set LAUNCH_MODE = false to show all 21 again.
- */
-const LAUNCH_MODE = false;
-const LAUNCH_SLUGS = ["mulugu", "moinabad", "kohir", "chevella", "aswaraopeta", "kalluru"];
-
 function Index() {
-  const { ulbs: allUlbs } = Route.useLoaderData() as { ulbs: Ulb[] };
-  const ulbs = LAUNCH_MODE
-    ? LAUNCH_SLUGS.map((s) => allUlbs.find((u) => u.slug === s)).filter(Boolean) as Ulb[]
-    : allUlbs;
+  const { ulbs } = Route.useLoaderData() as { ulbs: Ulb[] };
   return (
     <div className="min-h-screen flex flex-col">
       <TopGovBar />
