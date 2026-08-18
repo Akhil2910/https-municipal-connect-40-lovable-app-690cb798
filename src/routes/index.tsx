@@ -51,23 +51,29 @@ function Index() {
           <img src={hero} alt="" width={1920} height={1080}
                className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0" style={{ background: "var(--gradient-hero)", opacity: 0.9 }} />
-          <div className="relative container mx-auto px-4 py-10 md:py-14 text-primary-foreground animate-fade-up">
+          <div className="relative container mx-auto px-4 py-16 md:py-24 text-primary-foreground animate-fade-up">
             <p className="text-xs md:text-sm uppercase tracking-[0.3em] opacity-90">Telangana · CDMA</p>
-            <h2 className="font-display text-3xl md:text-4xl font-black mt-2">
-              Choose your Municipality
+            <h2 className="font-display text-4xl md:text-6xl font-black mt-2 max-w-3xl">
+              21 New Urban Local Bodies. One Citizen Portal.
             </h2>
+            <p className="mt-4 max-w-2xl text-base md:text-lg opacity-90">
+              Access services, news, notices, tenders and grievance redressal for every newly notified Municipality across Telangana.
+            </p>
 
-            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {ulbs.map((u) => (
                 <Link key={u.id} to="/$slug" params={{ slug: u.slug }}
-                      className="group bg-card text-foreground border rounded-2xl p-7 md:p-8 hover:shadow-[var(--shadow-elegant)] hover:-translate-y-1 transition">
-                  <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
-                    <div className="h-14 w-14 shrink-0 rounded-xl bg-gov-cream flex items-center justify-center">
-                      <Building2 className="h-7 w-7 text-gov-green" />
+                      className="group bg-card text-foreground border rounded-xl p-5 hover:shadow-[var(--shadow-elegant)] hover:-translate-y-1 transition">
+                  <div className="flex items-start gap-4">
+                    <div className="h-12 w-12 shrink-0 rounded-lg bg-gov-cream flex items-center justify-center">
+                      <Building2 className="h-6 w-6 text-gov-green" />
                     </div>
-                    <div className="min-w-0">
-                      <h3 className="font-display text-2xl md:text-3xl font-black text-gov-navy truncate">{u.name}</h3>
-                      <p className="text-sm text-muted-foreground truncate">{u.type} · {u.state}</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-display text-xl font-bold text-gov-navy">{u.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {u.type ?? "Municipality"}{u.code ? ` · Code ${u.code}` : " · Code"}
+                      </p>
+                      <p className="text-sm text-muted-foreground">{u.state ?? "Telangana"}</p>
                     </div>
                     <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground group-hover:text-gov-green group-hover:translate-x-0.5 transition" />
                   </div>
