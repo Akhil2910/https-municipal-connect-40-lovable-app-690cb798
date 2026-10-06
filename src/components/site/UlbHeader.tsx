@@ -3,7 +3,6 @@ const emblem = "/logos/ulb-emblem.png";
 const cmPortrait = "/logos/cm-portrait.png";
 const telanganaLogo = "/logos/telangana-emblem.png";
 const risingLogo = "/logos/rising-2047-logo-v2.png";
-const sridevi = "/images/tk-sridevi.webp";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import type { Ulb } from "@/lib/ulb-types";
