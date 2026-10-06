@@ -32,50 +32,52 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="bg-card shadow-sm border-b">
-      <div className="container mx-auto flex items-center gap-4 px-4 py-4">
-        <div className="hidden sm:flex items-center gap-3 shrink-0">
+    <header className="bg-gov-cream shadow-sm border-b">
+      <div className="container mx-auto flex items-center gap-4 md:gap-8 px-4 py-3">
+        <div className="hidden sm:flex items-center gap-6 shrink-0">
           <img
             src={telanganaLogo}
             alt="Government of Telangana emblem"
-            width={96}
-            height={96}
-            className="h-20 w-20 md:h-24 md:w-24 object-contain"
+            width={120}
+            height={120}
+            className="h-20 w-20 md:h-28 md:w-28 object-contain"
           />
-          <figure className="flex flex-col items-center">
-            <div className="h-20 w-20 md:h-24 md:w-24 rounded-full bg-white border-2 border-gov-navy shadow overflow-hidden">
-              <img
-                src={cmPortrait}
-                alt="Sri A. Revanth Reddy, Hon'ble Chief Minister"
-                width={96}
-                height={96}
-                className="h-full w-full object-cover object-top"
-              />
-            </div>
-            <figcaption className="mt-1 text-center leading-tight hidden md:block">
-              <p className="text-[10px] font-bold text-gov-navy">Sri A. Revanth Reddy</p>
-              <p className="text-[9px] text-gov-navy/70">Hon'ble Chief Minister</p>
+          <figure className="hidden md:flex flex-col items-center">
+            <img
+              src={cmPortrait}
+              alt="Sri A. Revanth Reddy, Hon'ble Chief Minister"
+              width={88}
+              height={112}
+              className="h-28 w-24 object-cover object-top"
+            />
+            <figcaption className="mt-1 text-center leading-tight">
+              <p className="text-xs text-foreground">Sri A.Revanth Reddy</p>
+              <p className="text-[10px] text-foreground">Hon'ble Chief Minister and Minister MA&amp;UD</p>
             </figcaption>
           </figure>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-xs uppercase tracking-widest text-gov-navy/70">
-            Government of Telangana · {ulb.type ?? "Municipality"}
+        <div className="flex-1 min-w-0 text-center">
+          <p className="text-sm md:text-lg text-foreground">
+            Government of Telangana
           </p>
-          <h1 className="font-display text-xl md:text-3xl font-black text-gov-navy truncate">
+          <h1 className="font-display text-xl md:text-3xl font-bold text-foreground">
             {ulb.name} {ulb.type ?? "Municipality"}
           </h1>
-          <p className="text-xs text-gov-navy/70 hidden md:block">
-            Office of the Commissioner · ULB Code {ulb.code}
-          </p>
         </div>
-        <div className="hidden sm:flex items-center shrink-0">
+        <div className="hidden sm:flex items-center gap-6 shrink-0">
           <img
             src={risingLogo}
             alt="Telangana Rising 2047"
-            width={96}
-            height={96}
-            className="h-20 w-20 md:h-24 md:w-24 object-contain"
+            width={120}
+            height={120}
+            className="h-20 w-20 md:h-28 md:w-28 object-contain"
+          />
+          <img
+            src="/logos/cdma-logo.jpeg"
+            alt="Commissioner & Director of Municipal Administration (CDMA)"
+            width={120}
+            height={120}
+            className="h-20 w-20 md:h-28 md:w-28 object-contain mix-blend-multiply"
           />
         </div>
         <button
