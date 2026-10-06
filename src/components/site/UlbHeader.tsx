@@ -87,7 +87,7 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
-      <nav className="bg-gov-green text-primary-foreground">
+      <nav className="bg-gov-navy text-primary-foreground">
         <ul className={`container mx-auto px-4 ${open ? "block" : "hidden"} lg:flex lg:items-center`}>
           {NAV.slice(0, 1).map((item) => (
             <li key={item.to}>
@@ -114,8 +114,8 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
                     to={item.to}
                     params={{ slug }}
                     onClick={() => setOpen(false)}
-                    className="block px-4 py-2.5 text-sm hover:bg-gov-green/10 lg:hover:text-gov-green"
-                    activeProps={{ className: "block px-4 py-2.5 text-sm font-bold bg-gov-green/10 text-gov-green" }}
+                    className="block px-4 py-2.5 text-sm hover:bg-gov-navy/10 lg:hover:text-gov-navy"
+                    activeProps={{ className: "block px-4 py-2.5 text-sm font-bold bg-gov-navy/10 text-gov-navy" }}
                   >
                     {item.label}
                   </Link>
@@ -161,7 +161,7 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
               href="https://emunicipal.telangana.gov.in/etistmvcdfwefrzxczx/hjhjhj)]"
               target="_blank"
               rel="noopener noreferrer"
-              className="block px-4 py-3 text-sm font-bold bg-gov-saffron text-gov-navy hover:opacity-90 transition"
+              className="block px-4 py-3 text-sm font-bold bg-white text-gov-navy hover:opacity-90 transition"
             >
               Ease of Doing Business ↗
             </a>
