@@ -81,6 +81,28 @@ function About() {
         </div>
       </section>
 
+      {/* Secretary MA&UD / CDMA */}
+      <section className="mt-8 bg-card border rounded-xl overflow-hidden">
+        <div className="grid gap-6 md:grid-cols-[240px_1fr] items-center p-6 md:p-8">
+          <div className="relative">
+            <div className="absolute -inset-2 bg-gradient-to-br from-gov-navy to-gov-green opacity-20 rounded-lg" />
+            <img
+              src="/images/tk-sridevi.webp"
+              alt="Dr. T.K. Sreedevi IAS"
+              width={240}
+              height={300}
+              className="relative w-full max-w-[240px] mx-auto rounded-lg object-cover shadow-[var(--shadow-elegant)]"
+            />
+          </div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-accent">Leadership</p>
+            <h3 className="font-display text-2xl md:text-3xl font-black text-gov-navy mt-1">Dr. T.K. Sreedevi IAS</h3>
+            <p className="text-sm text-muted-foreground">Secretary to Government, MA&amp;UD Dept &amp; CDMA, Government of Telangana</p>
+          </div>
+        </div>
+      </section>
+
+
       {/* Commissioner's Message */}
       {commissioner && (
         <section className="mt-8 bg-card border rounded-xl overflow-hidden">
