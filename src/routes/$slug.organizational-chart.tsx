@@ -26,7 +26,7 @@ function OrgChart() {
       <p className="text-muted-foreground mt-2">
         {ulb.name} {ulb.type ?? "Municipality"} · Administrative Hierarchy
       </p>
-      <div className="mx-auto mt-3 h-1 w-20 bg-gradient-to-r from-gov-navy via-primary to-gov-navy/40 rounded-full" />
+      <div className="mx-auto mt-3 h-1 w-20 bg-gradient-to-r from-gov-navy via-gov-navy/60 to-gov-navy/20 rounded-full" />
 
       {page?.body && <p className="mt-6 text-sm text-foreground/80 whitespace-pre-wrap">{page.body}</p>}
 
@@ -79,7 +79,7 @@ function BlueChart() {
         {CHART.map((d) => (
           <div key={d.title} className="flex flex-col items-center">
             <div className="h-5 w-px bg-gov-navy/40" />
-            <div className="w-full rounded-lg bg-primary text-primary-foreground text-center px-3 py-2 shadow">
+            <div className="w-full rounded-lg bg-gov-navy/80 text-primary-foreground text-center px-3 py-2 shadow">
               <p className="font-bold text-sm">{d.title}</p>
               {d.sub && <p className="text-xs opacity-90">{d.sub}</p>}
             </div>
@@ -87,7 +87,7 @@ function BlueChart() {
               {d.children?.map((c) => (
                 <div key={c.title} className="flex flex-col items-center">
                   <div className="h-3 w-px bg-gov-navy/40" />
-                  <div className="w-full rounded-full bg-primary/15 text-gov-navy border border-primary/40 text-center px-2 py-1 text-xs font-bold">
+                  <div className="w-full rounded-full bg-gov-navy/15 text-gov-navy border border-gov-navy/40 text-center px-2 py-1 text-xs font-bold">
                     {c.title}
                   </div>
                   {c.staff && (
