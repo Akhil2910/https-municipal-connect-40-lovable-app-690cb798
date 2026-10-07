@@ -63,7 +63,7 @@ function About() {
               alt={cm?.name ?? "Chief Minister"}
               width={240}
               height={300}
-              className="relative w-full max-w-[240px] mx-auto rounded-lg object-cover shadow-[var(--shadow-elegant)]"
+              className="relative w-full max-w-[240px] mx-auto rounded-lg aspect-[4/5] object-cover object-top shadow-[var(--shadow-elegant)]"
             />
           </div>
           <div>
@@ -82,16 +82,16 @@ function About() {
       </section>
 
       {/* Secretary MA&UD / CDMA */}
-      <section className="mt-8 bg-card border rounded-xl overflow-hidden">
+      <section className="mt-8 bg-gov-cream border rounded-xl overflow-hidden">
         <div className="grid gap-6 md:grid-cols-[240px_1fr] items-center p-6 md:p-8">
           <div className="relative">
-            <div className="absolute -inset-2 bg-gradient-to-br from-gov-navy to-gov-green opacity-20 rounded-lg" />
+            <div className="absolute -inset-2 bg-gradient-to-br from-gov-saffron to-gov-green opacity-20 rounded-lg" />
             <img
               src="/images/tk-sridevi.webp"
               alt="Dr. T.K. Sreedevi IAS"
               width={240}
               height={300}
-              className="relative w-full max-w-[240px] mx-auto rounded-lg object-cover shadow-[var(--shadow-elegant)]"
+              className="relative w-full max-w-[240px] mx-auto rounded-lg aspect-[4/5] object-cover object-top shadow-[var(--shadow-elegant)]"
             />
           </div>
           <div>
