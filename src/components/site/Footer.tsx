@@ -17,7 +17,6 @@ export function Footer({ ulb }: { ulb?: Ulb }) {
         <div>
           <h4 className="font-bold text-sm uppercase tracking-wider mb-3">Quick Links</h4>
           <ul className="space-y-2 text-sm opacity-90">
-            <li><Link to="/" className="hover:underline">All Municipalities</Link></li>
             {ulb && <>
               <li><Link to="/$slug/about" params={{ slug: ulb.slug }} className="hover:underline">About</Link></li>
               <li><Link to="/$slug/tenders" params={{ slug: ulb.slug }} className="hover:underline">Tenders</Link></li>
