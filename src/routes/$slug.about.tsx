@@ -109,13 +109,19 @@ function About() {
           <div className="grid gap-6 md:grid-cols-[240px_1fr] items-center p-6 md:p-8">
             <div className="relative">
               <div className="absolute -inset-2 bg-gradient-to-br from-gov-green to-gov-navy opacity-20 rounded-lg" />
-              <img
-                src={commissioner.photo_url || cmPortrait}
-                alt={commissioner.name}
-                width={240}
-                height={300}
-                className="relative w-full max-w-[240px] mx-auto rounded-lg object-cover shadow-[var(--shadow-elegant)]"
-              />
+              {commissioner.photo_url ? (
+                <img
+                  src={commissioner.photo_url}
+                  alt={commissioner.name}
+                  width={240}
+                  height={300}
+                  className="relative w-full max-w-[240px] mx-auto rounded-lg aspect-[4/5] object-cover object-top shadow-[var(--shadow-elegant)]"
+                />
+              ) : (
+                <div className="relative w-full max-w-[240px] mx-auto rounded-lg aspect-[4/5] bg-muted grid place-items-center text-muted-foreground text-sm">
+                  Photo coming soon
+                </div>
+              )}
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-accent">Message</p>
