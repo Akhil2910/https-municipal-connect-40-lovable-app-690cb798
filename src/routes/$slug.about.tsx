@@ -97,7 +97,7 @@ function About() {
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-accent">Leadership</p>
             <h3 className="font-display text-2xl md:text-3xl font-black text-gov-navy mt-1">Dr. T.K. Sreedevi IAS</h3>
-            <p className="text-sm text-muted-foreground">Secretary to Government, MA&amp;UD Dept &amp; CDMA, Government of Telangana</p>
+            <p className="text-sm text-muted-foreground">Secretary to Government, MA Dept &amp; CDMA, Government of Telangana</p>
           </div>
         </div>
       </section>
