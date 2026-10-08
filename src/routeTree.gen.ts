@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ScreenReaderRouteImport } from './routes/screen-reader'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -30,9 +32,19 @@ import { Route as SlugCoOptionMembersRouteImport } from './routes/$slug.co-optio
 import { Route as SlugChairpersonRouteImport } from './routes/$slug.chairperson'
 import { Route as SlugAboutRouteImport } from './routes/$slug.about'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScreenReaderRoute = ScreenReaderRouteImport.update({
   id: '/screen-reader',
   path: '/screen-reader',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugRoute = SlugRouteImport.update({
@@ -135,7 +147,9 @@ const SlugAboutRoute = SlugAboutRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
   '/screen-reader': typeof ScreenReaderRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/chairperson': typeof SlugChairpersonRoute
   '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
@@ -156,7 +170,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/screen-reader': typeof ScreenReaderRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/chairperson': typeof SlugChairpersonRoute
   '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
@@ -179,7 +195,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$slug': typeof SlugRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
   '/screen-reader': typeof ScreenReaderRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$slug/about': typeof SlugAboutRoute
   '/$slug/chairperson': typeof SlugChairpersonRoute
   '/$slug/co-option-members': typeof SlugCoOptionMembersRoute
@@ -203,7 +221,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$slug'
+    | '/robots.txt'
     | '/screen-reader'
+    | '/sitemap.xml'
     | '/$slug/about'
     | '/$slug/chairperson'
     | '/$slug/co-option-members'
@@ -224,7 +244,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/robots.txt'
     | '/screen-reader'
+    | '/sitemap.xml'
     | '/$slug/about'
     | '/$slug/chairperson'
     | '/$slug/co-option-members'
@@ -246,7 +268,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$slug'
+    | '/robots.txt'
     | '/screen-reader'
+    | '/sitemap.xml'
     | '/$slug/about'
     | '/$slug/chairperson'
     | '/$slug/co-option-members'
@@ -269,18 +293,34 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SlugRoute: typeof SlugRouteWithChildren
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   ScreenReaderRoute: typeof ScreenReaderRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/screen-reader': {
       id: '/screen-reader'
       path: '/screen-reader'
       fullPath: '/screen-reader'
       preLoaderRoute: typeof ScreenReaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug': {
@@ -460,7 +500,9 @@ const SlugRouteWithChildren = SlugRoute._addFileChildren(SlugRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SlugRoute: SlugRouteWithChildren,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   ScreenReaderRoute: ScreenReaderRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
