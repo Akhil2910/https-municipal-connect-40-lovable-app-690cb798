@@ -33,23 +33,39 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
 
   return (
     <header className="bg-gov-cream shadow-sm border-b">
-      <div className="container mx-auto flex items-center gap-3 md:gap-6 px-4 py-3">
+      {/* Small screens: all logos in one row, name below */}
+      <div className="lg:hidden container mx-auto px-3 pt-3">
+        <div className="flex items-end justify-between gap-2">
+          <img src={telanganaLogo} alt="Government of Telangana emblem" className="h-12 w-12 sm:h-16 sm:w-16 object-contain shrink-0" />
+          <figure className="flex flex-col items-center min-w-0">
+            <img src={cmPortrait} alt="Sri A. Revanth Reddy, Hon'ble Chief Minister" className="h-14 w-12 sm:h-20 sm:w-16 object-cover object-top" />
+            <figcaption className="mt-0.5 text-center leading-tight">
+              <p className="text-[9px] sm:text-[11px] text-foreground">Sri A.Revanth Reddy</p>
+              <p className="text-[8px] sm:text-[10px] text-foreground">Hon'ble CM &amp; Minister MA&amp;UD</p>
+            </figcaption>
+          </figure>
+          <img src={risingLogo} alt="Telangana Rising 2047" className="h-12 w-12 sm:h-16 sm:w-16 object-contain shrink-0" />
+          <img src="/logos/cdma-logo.jpeg" alt="CDMA" className="h-12 w-12 sm:h-16 sm:w-16 object-contain mix-blend-multiply shrink-0" />
+        </div>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 py-2">
+          <div className="min-w-0 text-center">
+            <p className="text-xs sm:text-sm text-foreground">Government of Telangana</p>
+            <h1 className="font-display text-lg sm:text-2xl font-bold text-foreground leading-tight break-words">
+              {ulb.name} {ulb.type ?? "Municipality"}
+            </h1>
+          </div>
+          <button aria-label="Toggle menu" onClick={() => setOpen((v) => !v)} className="shrink-0 p-2 rounded border">
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Large screens: single row */}
+      <div className="hidden lg:flex container mx-auto items-center gap-6 px-4 py-3">
         <div className="flex items-center gap-3 xl:gap-6 shrink-0">
-          <img
-            src={telanganaLogo}
-            alt="Government of Telangana emblem"
-            width={120}
-            height={120}
-            className="h-14 w-14 md:h-20 md:w-20 xl:h-28 xl:w-28 object-contain"
-          />
-          <figure className="hidden lg:flex flex-col items-center">
-            <img
-              src={cmPortrait}
-              alt="Sri A. Revanth Reddy, Hon'ble Chief Minister"
-              width={88}
-              height={112}
-              className="h-20 w-16 xl:h-28 xl:w-24 object-cover object-top"
-            />
+          <img src={telanganaLogo} alt="Government of Telangana emblem" width={120} height={120} className="h-20 w-20 xl:h-28 xl:w-28 object-contain" />
+          <figure className="flex flex-col items-center">
+            <img src={cmPortrait} alt="Sri A. Revanth Reddy, Hon'ble Chief Minister" width={88} height={112} className="h-20 w-16 xl:h-28 xl:w-24 object-cover object-top" />
             <figcaption className="mt-1 text-center leading-tight">
               <p className="text-xs text-foreground">Sri A.Revanth Reddy</p>
               <p className="text-[10px] text-foreground">Hon'ble Chief Minister and Minister MA&amp;UD</p>
@@ -57,36 +73,15 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
           </figure>
         </div>
         <div className="flex-1 min-w-0 text-center">
-          <p className="text-xs md:text-base xl:text-lg text-foreground">
-            Government of Telangana
-          </p>
-          <h1 className="font-display text-lg sm:text-2xl xl:text-3xl font-bold text-foreground leading-tight break-words">
+          <p className="text-base xl:text-lg text-foreground">Government of Telangana</p>
+          <p className="font-display text-2xl xl:text-3xl font-bold text-foreground leading-tight break-words">
             {ulb.name} {ulb.type ?? "Municipality"}
-          </h1>
+          </p>
         </div>
-        <div className="hidden lg:flex items-center gap-3 xl:gap-6 shrink-0">
-          <img
-            src={risingLogo}
-            alt="Telangana Rising 2047"
-            width={120}
-            height={120}
-            className="h-20 w-20 xl:h-28 xl:w-28 object-contain"
-          />
-          <img
-            src="/logos/cdma-logo.jpeg"
-            alt="Commissioner & Director of Municipal Administration (CDMA)"
-            width={120}
-            height={120}
-            className="h-20 w-20 xl:h-28 xl:w-28 object-contain mix-blend-multiply"
-          />
+        <div className="flex items-center gap-3 xl:gap-6 shrink-0">
+          <img src={risingLogo} alt="Telangana Rising 2047" width={120} height={120} className="h-20 w-20 xl:h-28 xl:w-28 object-contain" />
+          <img src="/logos/cdma-logo.jpeg" alt="Commissioner & Director of Municipal Administration (CDMA)" width={120} height={120} className="h-20 w-20 xl:h-28 xl:w-28 object-contain mix-blend-multiply" />
         </div>
-        <button
-          aria-label="Toggle menu"
-          onClick={() => setOpen((v) => !v)}
-          className="lg:hidden shrink-0 p-2 rounded border"
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
       </div>
       <nav className="bg-gov-navy text-primary-foreground">
         <ul className={`container mx-auto px-4 ${open ? "block" : "hidden"} lg:flex lg:items-center`}>
