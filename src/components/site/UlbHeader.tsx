@@ -33,22 +33,22 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
 
   return (
     <header className="bg-gov-cream shadow-sm border-b">
-      <div className="container mx-auto flex items-center gap-4 md:gap-8 px-4 py-3">
-        <div className="hidden sm:flex items-center gap-6 shrink-0">
+      <div className="container mx-auto flex items-center gap-3 md:gap-6 px-4 py-3">
+        <div className="flex items-center gap-3 xl:gap-6 shrink-0">
           <img
             src={telanganaLogo}
             alt="Government of Telangana emblem"
             width={120}
             height={120}
-            className="h-20 w-20 md:h-28 md:w-28 object-contain"
+            className="h-14 w-14 md:h-20 md:w-20 xl:h-28 xl:w-28 object-contain"
           />
-          <figure className="hidden md:flex flex-col items-center">
+          <figure className="hidden lg:flex flex-col items-center">
             <img
               src={cmPortrait}
               alt="Sri A. Revanth Reddy, Hon'ble Chief Minister"
               width={88}
               height={112}
-              className="h-28 w-24 object-cover object-top"
+              className="h-20 w-16 xl:h-28 xl:w-24 object-cover object-top"
             />
             <figcaption className="mt-1 text-center leading-tight">
               <p className="text-xs text-foreground">Sri A.Revanth Reddy</p>
@@ -57,33 +57,33 @@ export function UlbHeader({ ulb }: { ulb: Ulb }) {
           </figure>
         </div>
         <div className="flex-1 min-w-0 text-center">
-          <p className="text-sm md:text-lg text-foreground">
+          <p className="text-xs md:text-base xl:text-lg text-foreground">
             Government of Telangana
           </p>
-          <h1 className="font-display text-xl md:text-3xl font-bold text-foreground">
+          <h1 className="font-display text-lg sm:text-2xl xl:text-3xl font-bold text-foreground leading-tight break-words">
             {ulb.name} {ulb.type ?? "Municipality"}
           </h1>
         </div>
-        <div className="hidden sm:flex items-center gap-6 shrink-0">
+        <div className="hidden lg:flex items-center gap-3 xl:gap-6 shrink-0">
           <img
             src={risingLogo}
             alt="Telangana Rising 2047"
             width={120}
             height={120}
-            className="h-20 w-20 md:h-28 md:w-28 object-contain"
+            className="h-20 w-20 xl:h-28 xl:w-28 object-contain"
           />
           <img
             src="/logos/cdma-logo.jpeg"
             alt="Commissioner & Director of Municipal Administration (CDMA)"
             width={120}
             height={120}
-            className="h-20 w-20 md:h-28 md:w-28 object-contain mix-blend-multiply"
+            className="h-20 w-20 xl:h-28 xl:w-28 object-contain mix-blend-multiply"
           />
         </div>
         <button
           aria-label="Toggle menu"
           onClick={() => setOpen((v) => !v)}
-          className="lg:hidden p-2 rounded border"
+          className="lg:hidden shrink-0 p-2 rounded border"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
