@@ -37,6 +37,7 @@ export const Route = createRootRoute({
       { property: "og:description", content: "Official citizen services portal for Telangana's Urban Local Bodies." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "google-site-verification", content: "mN1C-sD_oNY0LJRNuw38qn0xSPD4BLl-6whzaXkvfQ4" },
     ],
     links: [
       {
