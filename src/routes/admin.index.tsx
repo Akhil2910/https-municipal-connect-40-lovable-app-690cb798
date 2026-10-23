@@ -151,12 +151,6 @@ function AdminDashboard() {
     { name: "photo_url", label: "Photo", type: "image" },
     { name: "sort_order", label: "Display order (1 = first)", type: "number", default: 0 },
   ];
-  const pagesFields: FieldDef[] = [
-    { name: "slug", label: "Slug (about, organizational-chart, media-coverage, etc.)", type: "text", required: true },
-    { name: "title", label: "Title", type: "text" },
-    { name: "body", label: "Body / Description", type: "textarea" },
-    { name: "image_url", label: "Image", type: "image" },
-  ];
 
   return (
     <div className="min-h-screen bg-gov-cream">
