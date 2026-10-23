@@ -20,12 +20,12 @@ export function MembersGrid({ members, emptyLabel }: { members: MemberLike[]; em
     );
   }
   return (
-    <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="mt-8 grid gap-5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
       {members.map((m) => (
         <div key={m.id} className="bg-card border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
-          <div className="aspect-[4/3] bg-gov-cream flex items-center justify-center overflow-hidden">
+          <div className="h-44 bg-gov-cream flex items-center justify-center overflow-hidden p-2">
             {m.photo_url ? (
-              <img src={m.photo_url} alt={m.name} className="h-full w-full object-cover" />
+              <img src={m.photo_url} alt={m.name} className="max-h-full max-w-full object-contain rounded" />
             ) : (
               <User className="h-16 w-16 text-muted-foreground/40" />
             )}
@@ -34,7 +34,7 @@ export function MembersGrid({ members, emptyLabel }: { members: MemberLike[]; em
             <h3 className="font-bold text-gov-navy">{m.name}</h3>
             {(m.designation || m.ward || m.constituency) && (
               <p className="text-xs text-muted-foreground mt-0.5">
-                {[m.designation, m.ward && `Ward ${m.ward}`, m.constituency].filter(Boolean).join(" · ")}
+                {[m.designation, m.ward && (/^ward/i.test(m.ward) ? m.ward : `Ward ${m.ward}`), m.constituency].filter(Boolean).join(" · ")}
               </p>
             )}
             <div className="mt-3 space-y-1 text-sm">
