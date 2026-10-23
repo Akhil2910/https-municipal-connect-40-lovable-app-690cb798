@@ -10,6 +10,7 @@ import { GrievancesSection } from "@/components/admin/GrievancesSection";
 import { UlbsSection } from "@/components/admin/UlbsSection";
 import { DomainsSection } from "@/components/admin/DomainsSection";
 import { AdminUsersSection } from "@/components/admin/AdminUsersSection";
+import { PageEditor } from "@/components/admin/PageEditor";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
@@ -75,7 +76,6 @@ function AdminDashboard() {
 
   const newsFields: FieldDef[] = [
     { name: "title", label: "Title", type: "text", required: true },
-    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "summary", label: "Summary", type: "textarea" },
     { name: "body", label: "Body", type: "textarea" },
     { name: "image_url", label: "Image", type: "image" },
@@ -83,23 +83,20 @@ function AdminDashboard() {
   ];
   const noticesFields: FieldDef[] = [
     { name: "title", label: "Title", type: "text", required: true },
-    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "category", label: "Category", type: "text" },
     { name: "notice_date", label: "Date", type: "date" },
     { name: "file_url", label: "File URL", type: "text" },
   ];
   const bannersFields: FieldDef[] = [
     { name: "title", label: "Title (hero heading)", type: "text" },
-    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "subtitle", label: "Subtitle", type: "text" },
     { name: "image_url", label: "Hero image", type: "image", required: true },
     { name: "link_url", label: "Link URL", type: "text" },
-    { name: "sort_order", label: "Sort", type: "number", default: 0 },
+    { name: "sort_order", label: "Display order (1 = first)", type: "number", default: 0 },
     { name: "is_active", label: "Active", type: "boolean", default: true },
   ];
   const tendersFields: FieldDef[] = [
     { name: "title", label: "Title", type: "text", required: true },
-    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "reference_no", label: "Reference No", type: "text" },
     { name: "category", label: "Category", type: "text" },
     { name: "description", label: "Description", type: "textarea" },
@@ -110,15 +107,13 @@ function AdminDashboard() {
   ];
   const leadershipFields: FieldDef[] = [
     { name: "name", label: "Name", type: "text", required: true },
-    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "role", label: "Role", type: "text", required: true },
     { name: "photo_url", label: "Photo", type: "image" },
     { name: "message", label: "Message", type: "textarea" },
-    { name: "sort_order", label: "Sort", type: "number", default: 0 },
+    { name: "sort_order", label: "Display order (1 = first)", type: "number", default: 0 },
   ];
   const deptFields: FieldDef[] = [
     { name: "name", label: "Name", type: "text", required: true },
-    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "head_name", label: "Head", type: "text" },
     { name: "description", label: "Description", type: "textarea" },
     { name: "phone", label: "Phone", type: "text" },
@@ -126,18 +121,16 @@ function AdminDashboard() {
   ];
   const galleryFields: FieldDef[] = [
     { name: "image_url", label: "Image", type: "image", required: true },
-    { name: "slug", label: "Slug (unique within ULB)", type: "text" },
     { name: "caption", label: "Caption", type: "text" },
     { name: "category", label: "Category", type: "text" },
   ];
   const servicesFields: FieldDef[] = [
-    { name: "slug", label: "Slug", type: "text", required: true },
     { name: "title", label: "Title", type: "text", required: true },
     { name: "icon", label: "Icon", type: "text" },
     { name: "short_description", label: "Short Description", type: "text" },
     { name: "content", label: "Content", type: "textarea" },
     { name: "external_url", label: "External URL", type: "text" },
-    { name: "sort_order", label: "Sort", type: "number", default: 0 },
+    { name: "sort_order", label: "Display order (1 = first)", type: "number", default: 0 },
   ];
   const councilFields: FieldDef[] = [
     { name: "name", label: "Name", type: "text", required: true },
@@ -146,7 +139,7 @@ function AdminDashboard() {
     { name: "phone", label: "Phone", type: "text" },
     { name: "email", label: "Email", type: "text" },
     { name: "photo_url", label: "Photo", type: "image" },
-    { name: "sort_order", label: "Sort", type: "number", default: 0 },
+    { name: "sort_order", label: "Display order (1 = first)", type: "number", default: 0 },
   ];
   const coOptionFields: FieldDef[] = councilFields;
   const publicRepsFields: FieldDef[] = [
@@ -156,13 +149,7 @@ function AdminDashboard() {
     { name: "phone", label: "Phone", type: "text" },
     { name: "email", label: "Email", type: "text" },
     { name: "photo_url", label: "Photo", type: "image" },
-    { name: "sort_order", label: "Sort", type: "number", default: 0 },
-  ];
-  const pagesFields: FieldDef[] = [
-    { name: "slug", label: "Slug (about, organizational-chart, media-coverage, etc.)", type: "text", required: true },
-    { name: "title", label: "Title", type: "text" },
-    { name: "body", label: "Body / Description", type: "textarea" },
-    { name: "image_url", label: "Image", type: "image" },
+    { name: "sort_order", label: "Display order (1 = first)", type: "number", default: 0 },
   ];
 
   return (
@@ -193,39 +180,43 @@ function AdminDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
-        <Tabs defaultValue={isSuper ? "ulbs" : "news"}>
+        <Tabs defaultValue={isSuper ? "ulbs" : "banners"}>
           <TabsList className="flex flex-wrap h-auto">
-            {isSuper && <TabsTrigger value="ulbs">ULBs</TabsTrigger>}
+            {isSuper && <TabsTrigger value="ulbs">Municipality Profile</TabsTrigger>}
+            <TabsTrigger value="banners">Home Slider Photos</TabsTrigger>
             <TabsTrigger value="news">News</TabsTrigger>
             <TabsTrigger value="notices">Notices</TabsTrigger>
-            <TabsTrigger value="banners">Banners</TabsTrigger>
-            <TabsTrigger value="tenders">Tenders</TabsTrigger>
-            <TabsTrigger value="leadership">Leadership</TabsTrigger>
-            <TabsTrigger value="departments">Departments</TabsTrigger>
-            <TabsTrigger value="gallery">Gallery</TabsTrigger>
-            <TabsTrigger value="services">Services</TabsTrigger>
+            <TabsTrigger value="leadership">Chairperson & Officers</TabsTrigger>
             <TabsTrigger value="council_members">Council Members</TabsTrigger>
             <TabsTrigger value="co_option_members">Co-option Members</TabsTrigger>
-            <TabsTrigger value="public_representatives">Public Reps</TabsTrigger>
-            <TabsTrigger value="pages">About Pages</TabsTrigger>
+            <TabsTrigger value="public_representatives">Public Representatives</TabsTrigger>
+            <TabsTrigger value="org_chart">Organizational Chart</TabsTrigger>
+            <TabsTrigger value="media">Media Coverage</TabsTrigger>
+            <TabsTrigger value="contact">Contact Page</TabsTrigger>
+            <TabsTrigger value="gallery">Photo Gallery</TabsTrigger>
+            <TabsTrigger value="tenders">Tenders</TabsTrigger>
+            <TabsTrigger value="departments">Departments</TabsTrigger>
+            <TabsTrigger value="services">Services</TabsTrigger>
             <TabsTrigger value="grievances">Grievances</TabsTrigger>
             {isSuper && <TabsTrigger value="domains">Domains</TabsTrigger>}
             {isSuper && <TabsTrigger value="admins">Admins</TabsTrigger>}
           </TabsList>
 
           {isSuper && <TabsContent value="ulbs"><UlbsSection /></TabsContent>}
-          <TabsContent value="news"><CrudSection table="news" ulbId={ulbId} fields={newsFields} title="News" /></TabsContent>
-          <TabsContent value="notices"><CrudSection table="notices" ulbId={ulbId} fields={noticesFields} title="Notices" /></TabsContent>
-          <TabsContent value="banners"><CrudSection table="banners" ulbId={ulbId} fields={bannersFields} title="Banners" /></TabsContent>
-          <TabsContent value="tenders"><CrudSection table="tenders" ulbId={ulbId} fields={tendersFields} title="Tenders" /></TabsContent>
-          <TabsContent value="leadership"><CrudSection table="leadership" ulbId={ulbId} fields={leadershipFields} title="Leadership" /></TabsContent>
-          <TabsContent value="departments"><CrudSection table="departments" ulbId={ulbId} fields={deptFields} title="Departments" /></TabsContent>
-          <TabsContent value="gallery"><CrudSection table="gallery" ulbId={ulbId} fields={galleryFields} title="Gallery" /></TabsContent>
-          <TabsContent value="services"><CrudSection table="services_info" ulbId={ulbId} fields={servicesFields} title="Services" /></TabsContent>
+          <TabsContent value="news"><CrudSection autoSlug table="news" ulbId={ulbId} fields={newsFields} title="News" /></TabsContent>
+          <TabsContent value="notices"><CrudSection autoSlug table="notices" ulbId={ulbId} fields={noticesFields} title="Notices" /></TabsContent>
+          <TabsContent value="banners"><CrudSection autoSlug table="banners" ulbId={ulbId} fields={bannersFields} title="Home Slider Photos" /></TabsContent>
+          <TabsContent value="tenders"><CrudSection autoSlug table="tenders" ulbId={ulbId} fields={tendersFields} title="Tenders" /></TabsContent>
+          <TabsContent value="leadership"><CrudSection autoSlug table="leadership" ulbId={ulbId} fields={leadershipFields} title="Chairperson, Vice Chairperson & Officers" /></TabsContent>
+          <TabsContent value="departments"><CrudSection autoSlug table="departments" ulbId={ulbId} fields={deptFields} title="Departments" /></TabsContent>
+          <TabsContent value="gallery"><CrudSection autoSlug table="gallery" ulbId={ulbId} fields={galleryFields} title="Photo Gallery" /></TabsContent>
+          <TabsContent value="services"><CrudSection autoSlug table="services_info" ulbId={ulbId} fields={servicesFields} title="Services" /></TabsContent>
           <TabsContent value="council_members"><CrudSection table="council_members" ulbId={ulbId} fields={councilFields} title="Council Members" /></TabsContent>
           <TabsContent value="co_option_members"><CrudSection table="co_option_members" ulbId={ulbId} fields={coOptionFields} title="Co-option Members" /></TabsContent>
           <TabsContent value="public_representatives"><CrudSection table="public_representatives" ulbId={ulbId} fields={publicRepsFields} title="Public Representatives" /></TabsContent>
-          <TabsContent value="pages"><CrudSection table="pages" ulbId={ulbId} fields={pagesFields} title="About / Content Pages" /></TabsContent>
+          <TabsContent value="org_chart"><PageEditor key={ulbId + "oc"} ulbId={ulbId} pageKey="organizational-chart" title="Organizational Chart" help="Upload the organizational chart picture and add any text." /></TabsContent>
+          <TabsContent value="media"><PageEditor key={ulbId + "mc"} ulbId={ulbId} pageKey="media-coverage" title="Media Coverage" help="Add press clippings text and a picture." /></TabsContent>
+          <TabsContent value="contact"><PageEditor key={ulbId + "ct"} ulbId={ulbId} pageKey="contact" title="Contact Page" /></TabsContent>
           <TabsContent value="grievances"><GrievancesSection ulbId={ulbId} /></TabsContent>
           {isSuper && <TabsContent value="domains"><DomainsSection ulbs={ulbs} /></TabsContent>}
           {isSuper && <TabsContent value="admins"><AdminUsersSection ulbs={ulbs} /></TabsContent>}

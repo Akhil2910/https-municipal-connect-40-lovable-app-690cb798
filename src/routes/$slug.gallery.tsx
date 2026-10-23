@@ -11,7 +11,7 @@ export const Route = createFileRoute("/$slug/gallery")({
     return { items: (data ?? []) as Gallery[] };
   },
   component: GalleryPage,
-  errorComponent: ({ error }) => <div className="container mx-auto px-4 py-12" role="alert">{error.message}</div>,
+  errorComponent: ({ error }) => <div className="container mx-auto px-4 py-12" role="alert">{(error as Error).message}</div>,
   notFoundComponent: () => <div className="container mx-auto px-4 py-12">No gallery.</div>,
 });
 

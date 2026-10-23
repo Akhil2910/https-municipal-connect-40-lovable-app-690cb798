@@ -58,7 +58,7 @@ export const Route = createFileRoute("/$slug")({
     <div className="min-h-screen flex items-center justify-center p-8 text-center">
       <div>
         <h1 className="font-display text-3xl font-bold">Municipality not found</h1>
-        <p className="text-muted-foreground mt-2">{error.message}</p>
+        <p className="text-muted-foreground mt-2">{(error as Error).message}</p>
       </div>
     </div>
   ),
