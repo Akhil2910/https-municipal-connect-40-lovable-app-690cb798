@@ -78,3 +78,19 @@ export const deleteUlbAdmin = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+/** Super admin sets a new password for any admin account (no email needed). */
+export const resetUserPassword = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ email: z.string().email(), password: z.string().min(8).max(72) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: list } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    const user = list?.users.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
+    if (!user) throw new Error("No account with that email");
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(user.id, { password: data.password });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
