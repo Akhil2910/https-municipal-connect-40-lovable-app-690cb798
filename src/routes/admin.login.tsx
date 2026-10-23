@@ -34,7 +34,7 @@ function Login() {
           </button>
         </div>
         <p className="text-xs text-muted-foreground mt-4">
-          First-time setup: create an account in <strong>Lovable Cloud → Users</strong>, then assign the <code>super_admin</code> role in the <code>user_roles</code> table.
+          Forgot your password? Ask the super admin to reset it from the <strong>Admins</strong> tab. If a super admin forgets, another super admin can reset it there.
         </p>
       </form>
     </div>

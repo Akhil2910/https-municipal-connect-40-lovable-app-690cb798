@@ -11,6 +11,7 @@ import { UlbsSection } from "@/components/admin/UlbsSection";
 import { DomainsSection } from "@/components/admin/DomainsSection";
 import { AdminUsersSection } from "@/components/admin/AdminUsersSection";
 import { HomeDetailsSection } from "@/components/admin/HomeDetailsSection";
+import { ChangePasswordButton, ResetPasswordCard } from "@/components/admin/PasswordTools";
 import { PageEditor } from "@/components/admin/PageEditor";
 
 export const Route = createFileRoute("/admin/")({
@@ -175,6 +176,7 @@ function AdminDashboard() {
               </Select>
             </div>
             <Button asChild variant="secondary"><Link to="/">View site</Link></Button>
+            <ChangePasswordButton email={email} />
             <Button variant="destructive" onClick={logout}>Logout</Button>
           </div>
         </div>
@@ -222,7 +224,7 @@ function AdminDashboard() {
           <TabsContent value="contact"><PageEditor key={ulbId + "ct"} ulbId={ulbId} pageKey="contact" title="Contact Page" /></TabsContent>
           <TabsContent value="grievances"><GrievancesSection ulbId={ulbId} /></TabsContent>
           {isSuper && <TabsContent value="domains"><DomainsSection ulbs={ulbs} /></TabsContent>}
-          {isSuper && <TabsContent value="admins"><AdminUsersSection ulbs={ulbs} /></TabsContent>}
+          {isSuper && <TabsContent value="admins"><ResetPasswordCard /><AdminUsersSection ulbs={ulbs} /></TabsContent>}
         </Tabs>
       </main>
     </div>
