@@ -22,9 +22,11 @@ type Props = {
   ulbId: string;
   fields: FieldDef[];
   title: string;
+  /** Generate a hidden web-address id automatically so staff never type one. */
+  autoSlug?: boolean;
 };
 
-export function CrudSection({ table, ulbId, fields, title }: Props) {
+export function CrudSection({ table, ulbId, fields, title, autoSlug }: Props) {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
@@ -63,6 +65,11 @@ export function CrudSection({ table, ulbId, fields, title }: Props) {
       if (payload[f.name] === "") payload[f.name] = null;
     }
     const { id, created_at, updated_at, ...rest } = payload;
+    if (autoSlug && !rest.slug) {
+      const base = String(rest.title || rest.name || rest.caption || "item")
+        .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "item";
+      rest.slug = `${base}-${Date.now().toString(36)}`;
+    }
     const op = id
       ? supabase.from(table as any).update(rest).eq("id", id)
       : supabase.from(table as any).insert(rest);
