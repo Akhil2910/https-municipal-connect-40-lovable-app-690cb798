@@ -10,6 +10,7 @@ import { GrievancesSection } from "@/components/admin/GrievancesSection";
 import { UlbsSection } from "@/components/admin/UlbsSection";
 import { DomainsSection } from "@/components/admin/DomainsSection";
 import { AdminUsersSection } from "@/components/admin/AdminUsersSection";
+import { HomeDetailsSection } from "@/components/admin/HomeDetailsSection";
 import { PageEditor } from "@/components/admin/PageEditor";
 
 export const Route = createFileRoute("/admin/")({
@@ -180,9 +181,10 @@ function AdminDashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
-        <Tabs defaultValue={isSuper ? "ulbs" : "banners"}>
+        <Tabs defaultValue="home">
           <TabsList className="flex flex-wrap h-auto">
-            {isSuper && <TabsTrigger value="ulbs">Municipality Profile</TabsTrigger>}
+            <TabsTrigger value="home">Home Page Details</TabsTrigger>
+            {isSuper && <TabsTrigger value="ulbs">All Municipalities</TabsTrigger>}
             <TabsTrigger value="banners">Home Slider Photos</TabsTrigger>
             <TabsTrigger value="news">News</TabsTrigger>
             <TabsTrigger value="notices">Notices</TabsTrigger>
@@ -202,6 +204,7 @@ function AdminDashboard() {
             {isSuper && <TabsTrigger value="admins">Admins</TabsTrigger>}
           </TabsList>
 
+          <TabsContent value="home"><HomeDetailsSection ulbId={ulbId} /></TabsContent>
           {isSuper && <TabsContent value="ulbs"><UlbsSection /></TabsContent>}
           <TabsContent value="news"><CrudSection autoSlug table="news" ulbId={ulbId} fields={newsFields} title="News" /></TabsContent>
           <TabsContent value="notices"><CrudSection autoSlug table="notices" ulbId={ulbId} fields={noticesFields} title="Notices" /></TabsContent>
